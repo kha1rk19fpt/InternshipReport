@@ -11,7 +11,7 @@ pre: " <b> 1.3. </b> "
 - Hiểu và triển khai mô hình Hybrid DNS sử dụng Route 53 Resolver để phân giải tên miền giữa On-premise và AWS.
 - Làm chủ các mô hình kết nối đa VPC (VPC Peering và Transit Gateway).
 - Hệ thống hóa kiến thức chuyên sâu về dịch vụ Compute (EC2, AMI, EBS, Auto-scaling).
-
+- Nắm bắt xu hướng AI Agentic và tư duy của một "Builder" tại AWS
 ### CÁC ĐẦU VIỆC CỦA WEEK 3:
 
 | Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
