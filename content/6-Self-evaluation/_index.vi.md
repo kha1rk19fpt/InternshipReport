@@ -1,13 +1,13 @@
 ---
 title: "Tự đánh giá"
-date: 2026-09-08
+date: 2026-10-28
 weight: 6
 chapter: false
 pre: " <b> 6. </b> "
 ---
 
-Trong suốt thời gian thực tập tại **AWS First Cloud AI Journey (FCAJ)** từ **07/09/2026** đến **...**, tôi đã có cơ hội học hỏi, rèn luyện và áp dụng kiến thức đã được trang bị tại trường vào môi trường làm việc thực tế.  
-Tôi tham gia dự án **CPAWS** - nền tảng dự đoán giá vàng, bạc, dầu Brent và WTI kèm chatbot giải thích trên Amazon Bedrock, với vai trò **Research Lead** phụ trách mô hình dự báo. Qua dự án, tôi cải thiện kỹ năng về ...
+Trong suốt thời gian thực tập tại **AWS First Cloud AI Journey (FCAJ)** từ **14/09/2026** đến **14/12/2026**, tôi đã có cơ hội học hỏi, rèn luyện và áp dụng kiến thức đã được trang bị tại trường vào môi trường làm việc thực tế.  
+Tôi tham gia dự án **CPAWS** - nền tảng dự đoán giá vàng, bạc, dầu Brent và WTI kèm chatbot giải thích trên Amazon Bedrock, với vai trò **Research Lead** phụ trách mô hình dự báo. Qua dự án, tôi cải thiện kỹ năng về việc sử dụng và ứng dụng hạ tầng Cloud của AWS vào các bài toán thực tế.
 
 Tôi luôn cố gắng hoàn thành tốt nhiệm vụ, tuân thủ nội quy, và tích cực trao đổi với các thành viên trong nhóm và mentor để nâng cao hiệu quả công việc.
 
@@ -15,8 +15,8 @@ Tôi luôn cố gắng hoàn thành tốt nhiệm vụ, tuân thủ nội quy, v
 
 | STT | Tiêu chí                            | Mô tả                                                                                            | Tốt | Khá | Trung bình |
 | --- | ----------------------------------- | ------------------------------------------------------------------------------------------------ | --- | --- | ---------- |
-| 1   | **Kiến thức và kỹ năng chuyên môn** | Hiểu biết về ngành, áp dụng kiến thức vào thực tế, kỹ năng sử dụng công cụ, chất lượng công việc | ☐   | ☐  | ☐          |
-| 2   | **Khả năng học hỏi**                | Tiếp thu kiến thức mới, học hỏi nhanh                                                            | ☐  | ☐   | ☐          |
+| 1   | **Kiến thức và kỹ năng chuyên môn** | Hiểu biết về ngành, áp dụng kiến thức vào thực tế, kỹ năng sử dụng công cụ, chất lượng công việc | ☐   | ✅  | ☐          |
+| 2   | **Khả năng học hỏi**                | Tiếp thu kiến thức mới, học hỏi nhanh                                                            | ☐  | ✅   | ☐          |
 | 3   | **Chủ động**                        | Tự tìm hiểu, nhận nhiệm vụ mà không chờ chỉ dẫn                                                  | ☐  | ☐   | ☐          |
 | 4   | **Tinh thần trách nhiệm**           | Hoàn thành công việc đúng hạn, đảm bảo chất lượng                                                | ☐  | ☐   | ☐          |
 | 5   | **Kỷ luật**                         | Tuân thủ giờ giấc, nội quy, quy trình làm việc                                                   | ☐  | ☐   | ☐          |
@@ -24,7 +24,7 @@ Tôi luôn cố gắng hoàn thành tốt nhiệm vụ, tuân thủ nội quy, v
 | 7   | **Giao tiếp**                       | Trình bày ý tưởng, báo cáo công việc rõ ràng                                                     | ☐   | ☐  | ☐          |
 | 8   | **Hợp tác nhóm**                    | Làm việc hiệu quả với đồng nghiệp, tham gia nhóm                                                 | ☐  | ☐   | ☐          |
 | 9   | **Ứng xử chuyên nghiệp**            | Tôn trọng đồng nghiệp, đối tác, môi trường làm việc                                              | ☐  | ☐   | ☐          |
-| 10  | **Tư duy giải quyết vấn đề**        | Nhận diện vấn đề, đề xuất giải pháp, sáng tạo                                                    | ☐  | ☐   | ☐          |
+| 10  | **Tư duy giải quyết vấn đề**        | Nhận diện vấn đề, đề xuất giải pháp, sáng tạo                                                    | ☐  | ✅   | ☐          |
 | 11  | **Đóng góp vào dự án/tổ chức**      | Hiệu quả công việc, sáng kiến cải tiến, ghi nhận từ team                                         | ☐  | ☐   | ☐          |
 | 12  | **Tổng thể**                        | Đánh giá chung về toàn bộ quá trình thực tập                                                     | ☐  | ☐   | ☐          |
 
