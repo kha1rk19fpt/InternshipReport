@@ -7,7 +7,6 @@ pre: " <b> 1.1. </b> "
 ---
 
 ### MỤC TIÊU TRONG WEEK 1:
-- Kết nối, gặp gỡ, làm quen với môi trường, cộng đồng FCAJ
 - Bước đầu khám phá, tìm hiểu về tài khoản AWS
 - Học một số thuật ngữ, khái niệm cơ bản trong các kiến trúc AWS
 
