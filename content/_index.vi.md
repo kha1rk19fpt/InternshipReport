@@ -11,19 +11,19 @@ chapter: false
 
 &emsp; **Họ và tên:** Trịnh Tiến Khải 
 
-&emsp; **Số điện thoại:** ...
+&emsp; **Số điện thoại:** 0943580877
 
-&emsp; **Email:** ...
+&emsp; **Email:** khaitrinh2005@gmail.com
 
-&emsp; **Trường:** ...
+&emsp; **Trường:** Đại học FPT TP.HCM
 
-&emsp; **Ngành:** ...
+&emsp; **Ngành:** Trí Tuệ Nhân Tạo
 
 &emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Vietnam
 
 &emsp; **Vị trí thực tập:** FCAJ Cloud Intern
 
-&emsp; **Thời gian thực tập:** Từ ngày 07/09/2026 đến ngày ...
+&emsp; **Thời gian thực tập:** Từ ngày 14/09/2026 đến ngày 14/12/2026
 
 ![Ảnh đại diện của bạn](/images/avatar.jpg)
 
