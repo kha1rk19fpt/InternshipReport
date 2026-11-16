@@ -27,4 +27,4 @@ pre: " <b> 1.10. </b> "
 2. Xây dựng hoàn chỉnh luồng xử lý Serverless Backend: Tự động hóa xử lý ảnh với S3 Trigger và quản lý dữ liệu NoSQL với DynamoDB.
 3. Triển khai thành công Full-stack Serverless App: Kết nối Frontend với Backend thông qua API Gateway và Lambda, xử lý tốt vấn đề CORS.
 4. Thiết lập quy trình DevOps tự động (CI/CD) cho ứng dụng Serverless, giúp việc deploy Code và Frontend trở nên nhanh chóng và ít lỗi.
-5. ...
+5. Theo dõi và duyệt lượt chạy official test2020 của dự án CPAWS (16/11): S1a cải thiện có ý nghĩa thống kê ở bạc, WTI, Brent; champion giữ `baseline-q252` theo kế hoạch đã khóa.

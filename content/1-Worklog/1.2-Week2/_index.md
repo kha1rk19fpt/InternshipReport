@@ -1,6 +1,6 @@
 ---
 title: "Week 2 Worklog"
-date: 2026-09-13
+date: 2026-09-21
 weight: 2
 chapter: false
 pre: " <b> 1.2. </b> "
@@ -8,24 +8,25 @@ pre: " <b> 1.2. </b> "
 
 ### OBJECTIVES IN WEEK 2:
 - Understand and practice secure user access management with AWS IAM.
-- Master Amazon VPC network architecture and network security layers (Security Groups, NACL).
-- Implement Hybrid Cloud connectivity via AWS Site-to-Site VPN.
-- Consolidate networking knowledge and kick off the CPAWS team project.
+- Master the Amazon VPC network architecture and network security layers (Security Groups, NACL).
+- Implement Hybrid Cloud connectivity through AWS Site-to-Site VPN.
+- Consolidate the networking knowledge learned and kick off the CPAWS team project.
 
 ### TASKS OF WEEK 2:
 
 | Day | Task | Start Date | End Date | References |
 |:---:|---|:---:|:---:|---|
-| **Mon** | **- Practice Lab 4: Access Management with AWS Identity and Access Management (IAM)**<br>+ IAM User and IAM Group<br>+ IAM Role<br>+ Switching Roles<br>**- Practice Lab 5: Getting Started with Amazon Virtual Private Cloud (VPC) and AWS Site-to-Site VPN**<br>+ Introduction to Amazon VPC:<br>* Subnets<br>* Route Table<br>* Internet Gateway<br>* NAT Gateway<br>+ Network Security with Security Groups and Network ACLs:<br>* Security groups<br>* Network ACLs<br>* VPC Resource Map | 14/09/2026 | 14/09/2026 | [Lab 4 Guide](https://000002.awsstudygroup.com/vi/)<br>[Lab 5 Intro](https://000003.awsstudygroup.com/vi/1-introduce/)<br>[Lab 5 Firewall](https://000003.awsstudygroup.com/vi/2-firewallinvpc/) |
-| **Tue** | **- Continue Lab 5 Practice:**<br>+ Prepare Environment:<br>* Create VPC<br>* Create Subnet<br>* Create Internet Gateway<br>* Create Route Table<br>* Create Security Group<br>* Enable VPC Flow Logs<br>+ Deploy Amazon EC2 Instance<br>* Create EC2 Instances<br>* Test Connectivity Methods<br>* Create Multi-AZ NAT Gateway<br>* Use Reachability Analyzer<br>* Configure EIC Endpoint<br>* AWS Systems Manager Session Manager<br>* CloudWatch Monitoring & Alerting | 15/09/2026 | 15/09/2026 | [Lab 5 Prerequisite](https://000003.awsstudygroup.com/vi/3-prerequisite/)<br>[Lab 5 Create EC2](https://000003.awsstudygroup.com/vi/4-createec2server/) |
-| **Wed** | **- Continue Lab 5 Practice:**<br>+ Setup AWS Site-to-Site VPN:<br>* Create VPN Environment<br>Create VPC for VPN<br>Create EC2 Instance<br>* Configure VPN Connection<br>Create Virtual Private Gateway<br>Create Customer Gateway<br>Create VPN Connection<br>Configure Customer Gateway<br>Customize AWS VPN Tunnel<br>Advanced VPN Configuration | 16/09/2026 | 16/09/2026 | [Lab 5 VPN](https://000003.awsstudygroup.com/vi/5-vpnsitetosite/) |
-| **Thu** | **- Consolidate notes from Lab 4 and Lab 5**<br>+ Redraw the VPC diagram (Subnet, Route Table, IGW, NAT Gateway) and the Site-to-Site VPN flow on draw.io<br>+ Review the differences between Security Groups and Network ACLs | 17/09/2026 | 17/09/2026 | [Lab 5 VPN](https://000003.awsstudygroup.com/vi/5-vpnsitetosite/) |
-| **Fri** | **- Team project meeting: brainstorming, analyzing, researching to select a suitable idea**<br>+ The CPAWS team (5 members) agreed on working rules and communication channels<br>+ I proposed forecasting prices of commodities traded both globally and in Vietnam (gold, silver, crude oil) | 18/09/2026 | 18/09/2026 | [World Bank Commodity Markets](https://www.worldbank.org/en/research/commodity-markets)<br>[Proposal Guide](https://workshop-sample.fcjuni.com/2-proposal/) |
+| **Mon** | **- Practice Lab 4: Access management with AWS Identity and Access Management (IAM)**<br>+ IAM User and IAM Group<br>+ IAM Role<br>+ Switching roles<br>**- Practice Lab 5: Getting started with Amazon Virtual Private Cloud (VPC) and AWS Site-to-Site VPN**<br>+ Introduction to Amazon VPC:<br>* Subnets<br>* Route Table<br>* Internet Gateway<br>* NAT Gateway<br>+ Network security with Security Groups and Network ACLs:<br>* Security groups<br>* Network ACLs<br>* VPC Resource Map | 21/09/2026 | 21/09/2026 | [Lab 4 Guide](https://000002.awsfcaj.com/vi/)<br>[Lab 5 Intro](https://000003.awsfcaj.com/vi/1-introduce/)<br>[Lab 5 Firewall](https://000003.awsfcaj.com/vi/2-firewallinvpc/) |
+| **Tue** | - Went to the office for the first time and talked with the mentor.<br>- Met, got to know and formed a team with other members of the FCAJ program.<br>**- Continue Lab 5:**<br>+ Prepare the environment:<br>* Create a VPC<br>* Create a Subnet<br>* Create an Internet Gateway<br>* Create a Route Table<br>* Create a Security Group<br>* Enable VPC Flow Logs<br>+ Deploy Amazon EC2 Instances<br>* Create EC2 Instances<br>* Test connection methods<br>* Create a Multi-AZ NAT Gateway<br>* Use Reachability Analyzer<br>* Configure an EIC Endpoint<br>* AWS Systems Manager Session Manager<br>* CloudWatch Monitoring & Alerting | 22/09/2026 | 22/09/2026 | [Lab 5 Prerequisite](https://000003.awsfcaj.com/vi/3-prerequisite/)<br>[Lab 5 Create EC2](https://000003.awsfcaj.com/vi/4-createec2server/) |
+| **Wed** | **- Continue Lab 5:**<br>+ Set up AWS Site-to-Site VPN:<br>* Create the VPN environment<br>Create a VPC for the VPN<br>Create an EC2 Instance<br>* Configure the VPN connection<br>Create a Virtual Private Gateway<br>Create a Customer Gateway<br>Create the VPN connection<br>Configure the Customer Gateway<br>Customize the AWS VPN Tunnel<br>Advanced VPN configuration | 23/09/2026 | 23/09/2026 | [Lab 5 VPN](https://000003.awsfcaj.com/vi/5-vpnsitetosite/) |
+| **Thu** | **- Consolidate notes from Lab 4 and Lab 5**<br>+ Redraw the VPC diagram (Subnet, Route Table, IGW, NAT Gateway) and the Site-to-Site VPN flow on draw.io<br>+ Review the differences between Security Groups and Network ACLs | 24/09/2026 | 24/09/2026 | [Lab 5 VPN](https://000003.awsfcaj.com/vi/5-vpnsitetosite/) |
+| **Fri** | **- Team project meeting: brainstorm, analyze and research to select a suitable idea**<br>+ The CPAWS team (5 members) agreed on how to work and the communication channels<br>+ I proposed forecasting prices of commodities traded both globally and in Vietnam (gold, silver, crude oil) | 25/09/2026 | 25/09/2026 | [World Bank Commodity Markets](https://www.worldbank.org/en/research/commodity-markets) |
 
 ### ACHIEVEMENTS IN WEEK 2:
-1. Completed Lab 4, proficient in creating IAM Users, Groups, and Roles for proper access control.
-2. Successfully built VPC network infrastructure with all components: Subnet, Route Table, IGW, NAT Gateway.
-3. Configured multi-layer network security using Security Groups and Network ACLs.
-4. Deployed and monitored EC2 Instances, configured secure access via Session Manager and EIC Endpoint.
-5. Successfully established AWS Site-to-Site VPN connection between AWS and a simulated On-premise environment.
-6. Formed the CPAWS team and listed initial project directions, including forecasting gold, silver, and crude oil prices.
+1. Went to the AWS office for the first time and formed a team.
+2. Completed Lab 4 and became proficient at creating IAM Users, Groups and Roles for proper access control.
+3. Successfully built a VPC network with all components: Subnet, Route Table, IGW, NAT Gateway.
+4. Configured multi-layer network security using Security Groups and Network ACLs.
+5. Deployed and monitored EC2 Instances, configured secure access via Session Manager and EIC Endpoint.
+6. Successfully set up an AWS Site-to-Site VPN connection between AWS and a simulated on-premises environment.
+7. Formed the CPAWS team and came up with initial project ideas, including forecasting gold, silver and crude oil prices.

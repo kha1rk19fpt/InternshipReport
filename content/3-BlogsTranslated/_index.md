@@ -1,21 +1,21 @@
 ---
-title: "Technical Blogs"
+title: "Blogs Posted"
 date: 2026-09-08
 weight: 3
 chapter: false
 pre: " <b> 3. </b> "
 ---
 
-The three blog posts below are written by me, summarizing what I learned and researched while building the model and infrastructure of the CPAWS project.
+The three blog posts below were written by me from what I learned about AWS services while working on the CPAWS project, and posted to the [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj) community. Each post uses its own example and a diagram I drew in draw.io.
 
-### [Blog 1 - Don't Be Fooled by "99% Accuracy": Forecasting Return Distributions with Pinball Loss](3.1-Blog1/)
+### [Blog 1 - A Model That Runs a Few Seconds a Day: Do You Need a SageMaker Endpoint?](3.1-Blog1/)
 
-Why forecasting price levels creates illusory accuracy, how to switch to forecasting 7 quantiles of log returns, scoring with pinball loss, and comparing against a 252-session quantile baseline. It ends with a real result: DLinear lost to the statistical baseline in 28/28 groups on the 2019 validation set, and the lessons learned.
+Compares the four SageMaker inference options with an AWS Lambda container image for a nightly forecasting job: zip versus container limits, the 7 flows of the pipeline (ECR, EventBridge Scheduler, Lambda destinations, S3, DynamoDB, CloudWatch), retries for asynchronous invocations, and cost.
 
-### [Blog 2 - Five Look-Ahead Leakage Traps in Financial Time-Series Forecasting](3.2-Blog2/)
+### [Blog 2 - Amazon S3 Versioning: Reproducing Data Processing Results When Files Get Overwritten](3.2-Blog2/)
 
-Five ways future information leaks into a model: full-series CEEMDAN, wrong scaling, dating news by event instead of publication, forward-filling the target across exchange holidays, and reusing the test set. Each trap comes with a fix and a sample automated test.
+Organizing a layered data lake, how S3 Versioning keeps old versions, pinning input data with VersionId and SHA-256 before an evaluation run, the `s3:GetObjectVersion` permission, and lifecycle rules for old versions.
 
-### [Blog 3 - Serverless Batch Prediction on AWS: EventBridge Scheduler, Lambda Container Images and DynamoDB](3.3-Blog3/)
+### [Blog 3 - Designing a DynamoDB Table: Start from the Questions, Not from the Data](3.3-Blog3/)
 
-How to build a daily prediction flow with no 24/7 resources: scheduling with EventBridge Scheduler, chaining Lambdas with Lambda Destinations, NumPy inference in a container image, query-driven DynamoDB design, and a cost estimate.
+Choosing the partition key and sort key from the application's questions, reading the latest record with Query `Limit=1`, storing one forecast run per item, and conditional writes so a rerun job never overwrites data.

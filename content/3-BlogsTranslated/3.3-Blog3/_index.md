@@ -1,89 +1,122 @@
 ---
 title: "Blog 3"
-date: 2026-11-10
+date: 2026-11-16
 weight: 3
 chapter: false
 pre: " <b> 3.3. </b> "
 ---
 
-# Serverless Batch Prediction on AWS: EventBridge Scheduler, Lambda Container Images and DynamoDB
+# Designing a DynamoDB Table: Start from the Questions, Not from the Data
 
-*Trịnh Tiến Khải · CPAWS team · Self-written from my project work*
+*Trinh Tien Khai · Posted in the AWS Study Group: [LINK TO BE ADDED AFTER POSTING]*
 
-When thinking about "putting an ML model on the cloud", many students (me included, at first) immediately picture an always-on inference endpoint. But for CPAWS — forecasting gold, silver and oil prices 1–7 days ahead — the data changes only **once a day**, after the trading session closes. A 24/7 server returning the same result all day is waste. This post shares how my team built a fully serverless **batch prediction** flow at very low cost, and the design choices behind it.
+Being used to SQL, when I first learned Amazon DynamoDB I designed tables out of old habit: normalize the data, one number per row, filter for whatever you need. After reading the documentation carefully I realized DynamoDB requires the opposite mindset: you must know what the application will ask before choosing the keys. This post walks through that approach with an example, a diagram that numbers each flow, and a feature I think is well worth knowing: conditional writes.
 
-## 1. Problem and Requirements
+![DynamoDB: choosing keys from the questions and conditional writes](/images/3-Blog/blog3-dynamodb-key-design.png)
 
-- 4 assets (gold, silver, Brent, WTI), each with 7 horizons × 7 quantiles
-- Run once after each Monday–Friday trading session
-- One failing data source must not break the whole flow
-- The web and chatbot read the latest result with low latency
-- Total cost must fit within about 200 USD of credit for the whole project
+*Figure 1. Example diagram of a weather forecast app reading and writing a DynamoDB table, drawn by me in draw.io based on AWS documentation.*
 
-## 2. Architecture
+**Scenario:** a weather app runs a nightly job that computes a 7-day forecast for each city. The web app and API need to show the latest forecast. If the data were stored SQL-style (one row per city, per day, per metric), showing one city's forecast on the home page would mean reading dozens of items or scanning the table. With DynamoDB, that design is both slow and expensive.
 
-```text
-EventBridge Scheduler ──► Lambda ingest ──► S3 (raw/, clean/)
-                               │
-                   Lambda Destinations (OnSuccess + OnFailure)
-                               ▼
-                         Lambda predict (container, NumPy) ──► DynamoDB Forecasts
-                                                                   ▲
-                                         API Gateway + Cognito ────┘ (web, chatbot)
+## 1. List the questions first
+
+Write down the questions the application will ask:
+
+- "What is the latest forecast for Hanoi?" (home page)
+- "What was the forecast created on 2026-08-01 for Da Nang?" (history)
+- Does any question need a full table scan? Here, no.
+
+## 2. Choose the keys
+
+- **Partition key:** `city`
+- **Sort key:** `forecast_date`, as a `YYYY-MM-DD` string. Sorting this format alphabetically is the same as sorting by time.
+
+The first question becomes a reverse Query that returns exactly 1 item:
+
+```python
+# Simplified illustration
+import boto3
+from boto3.dynamodb.conditions import Key
+
+table = boto3.resource("dynamodb").Table("Forecasts")
+
+def latest(city: str) -> dict | None:
+    resp = table.query(
+        KeyConditionExpression=Key("city").eq(city),
+        ScanIndexForward=False,  # forecast_date descending
+        Limit=1,
+    )
+    items = resp.get("Items", [])
+    return items[0] if items else None
 ```
 
-### EventBridge Scheduler Instead of Cron on a Server
+The second question is a GetItem with both keys. No GSI, no Scan.
 
-The schedule `cron(15 12 ? * TUE-SAT *)` (UTC) runs early morning New York time, after the previous day's session has closed. Tuesday–Saturday in UTC corresponds to the Monday–Friday sessions. No server needs to stay awake waiting.
+## 3. What an item contains
 
-### Chaining Two Lambdas with Lambda Destinations
+Instead of one number per row, put one whole forecast run for a city into a single item: the next 7 days, each with temperature, rainfall and humidity, plus the model version and creation time. Each read costs a single request, and the application does not have to stitch rows together. Just keep in mind the 400 KB item size limit.
 
-Instead of having the ingest Lambda call the predict Lambda in code, we configured **Lambda Destinations**: when ingest finishes, whether it succeeds or fails, AWS invokes predict. Why also on failure? Ingest may fail for one source (say Brent) while other assets still have good data. Predict checks each asset: if an asset is **missing the latest session, it is skipped** rather than falling back to an older date, so an old forecast is never shown as if it were new.
+A small detail: with the boto3 resource, numbers must be passed as `Decimal`; passing a `float` raises an error. If you round numbers before writing, remember that the values read back may differ very slightly from those computed in memory, so compare with a tolerance, never with exact equality.
 
-Predict uses `retry_attempts=0`, because if the input data is wrong, retrying does not help; failures trigger a CloudWatch Alarm for the owner to investigate.
+## 4. Following the 7 flows in the diagram
 
-### Lambda Container Images and NumPy Inference
+1. The user opens the web app on AWS Amplify Hosting and signs in with Amazon Cognito to get an ID token.
+2. The web app calls API Gateway (REST) with the header `Authorization: <ID token>`. The Cognito authorizer checks the token before letting the request through.
+3. The api Lambda reads the table with Query `Limit=1` (latest forecast) or GetItem (by date).
+4. EventBridge Scheduler runs the forecast job every night.
+5. The batch Lambda writes the results with a conditional PutItem.
+6. If the job runs again (run by hand, or retried by Lambda), the second write is rejected with `ConditionalCheckFailedException`. The code catches this error and treats it as "already there", not as an incident.
+7. An experimental model runs in parallel on the same data but writes to S3, not to the serving table. Users only see the main model's results, while the new model is still scored on real data.
 
-Training (DLinear) uses PyTorch, which is too heavy for Lambda. The team converts model weights to NumPy (`weights.npz` plus `config.json`, `scaler.json`, `manifest.json`) and wrote a pure NumPy inference class. The image is packaged as a **container image on ECR**:
-- Images are tagged with the **commit SHA** so we know exactly which code is running
-- The base image is **pinned by digest** for reproducible builds
-- Built with Docker BuildKit for speed
+## 5. Conditional writes: never overwrite an existing record
 
-The product currently uses the 252-session statistical baseline (DLinear did not beat it on the validation set), so inference is even lighter. The architecture stays the same, so a better model only requires swapping the artifact.
+DynamoDB has no "insert" command. PutItem overwrites by default if an item with the same key exists. To make each (`city`, `forecast_date`) pair writable only once, add a `ConditionExpression`:
 
-### Designing the DynamoDB Table for the Query
+```python
+# Simplified illustration
+from botocore.exceptions import ClientError
 
-The only query the web and chatbot need is: *"the latest forecast for asset X"*. So the `Forecasts` table has:
-- **Partition key** `asset` (gold, silver, brent, wti)
-- **Sort key** `base_date` (the reference trading date)
+def put_once(item: dict) -> bool:
+    try:
+        table.put_item(
+            Item=item,
+            ConditionExpression="attribute_not_exists(city) AND attribute_not_exists(forecast_date)",
+        )
+        return True
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            return False  # a record for this date already exists
+        raise
+```
 
-Fetching the latest item is a single `Query` on `asset`, sorted descending by `base_date`, with `Limit=1`. No `Scan`, no secondary index. Results are precomputed, so the API only reads and formats, with very low latency. The API Lambda and the chatbot share **one formatting function**, so numbers on the web and in chatbot answers always match.
+Three things I found while reading the documentation:
 
-## 3. Cost: Why Only a Few USD per Month
+- The condition is checked on that item and applied atomically with the write, so there is no need to "read first, then write". Reading first and then writing can still be interrupted by another process in between.
+- A rejected write still consumes write capacity, depending on the item size.
+- The `ReturnValuesOnConditionCheckFailure` parameter makes DynamoDB return the existing item when the condition fails, saving an extra read to see what happened.
 
-A simple estimate for the prediction path (reference prices; check the AWS pricing pages):
+## Checklist for designing a DynamoDB table
 
-| Component | Monthly usage | Note |
-|---|---|---|
-| EventBridge Scheduler | about 22 invocations | within the free tier |
-| Lambda ingest + predict | about 44 runs, each under 1 minute | hundreds to a few thousand GB-seconds |
-| DynamoDB on-demand | hundreds of writes, thousands of reads | a few cents |
-| S3 | a few hundred MB of Parquet | a few cents |
+- Have you listed every question the application will ask? Is each one a Query or a GetItem?
+- Does the sort key sort in the order you need (for example dates as `YYYY-MM-DD`)?
+- Does any question require a Scan? If so, revisit the keys or add a GSI.
+- Could an item exceed 400 KB?
+- Is overwriting the behavior you want? If not, use a `ConditionExpression`.
+- Do comparisons of numbers read from DynamoDB use a tolerance?
 
-For comparison, an always-on inference endpoint, even the smallest size, is billed for all 730 hours of the month — many times the cost of the whole flow above. The most expensive part of the system is actually **Amazon Bedrock** when the chatbot is heavily used, so we control it with Cognito sign-in, routing simple questions to a smaller model, and limiting `max_tokens` by question type. AWS Budgets alerts at 50 USD/month.
+## Conclusion
 
-## 4. What I Learned
+With DynamoDB, choosing the right keys matters more than anything else. Start from the questions and every read becomes a Query or a GetItem, with no GSI or Scan. Conditional writes are the cheapest and safest way to get "write only once" semantics, which suits batch jobs that may be rerun.
 
-1. **Ask "how often does the data change?" before choosing an architecture.** If the answer is once a day, batch prediction is almost always cheaper and simpler than real-time inference.
-2. **Design for failure from the start.** Decoupling ingest and predict, running predict even when ingest fails, never falling back a day: three small decisions that keep the system from silently showing wrong data.
-3. **Design tables around queries.** With DynamoDB, think about the query first, then choose the keys.
-4. **Make everything traceable.** Images tagged by commit, model artifacts with a manifest, date-partitioned data on S3: when a number on the web looks odd, we know exactly where it came from.
+*Note: service prices and limits may change, so check the latest AWS documentation. The code is a simplified illustration.*
 
-## References
+### References
 
-- [Amazon EventBridge Scheduler – User Guide](https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html)
-- [AWS Lambda – Capturing records of asynchronous invocations (Destinations)](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html)
-- [AWS Lambda – Create a Lambda function using a container image](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
-- [Amazon DynamoDB – Querying tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html)
-- [AWS Lambda Pricing](https://aws.amazon.com/lambda/pricing/)
-- [AWS Well-Architected Framework – Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html)
+- [Condition expressions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html)
+- [DynamoDB read and write operations (capacity on failed conditions)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/read-write-operations.html)
+- [PutItem API](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html)
+- [Query](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html)
+- [Best practices for designing partition keys](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html)
+- [Handle conditional write errors in high concurrency scenarios](https://aws.amazon.com/blogs/database/handle-conditional-write-errors-in-high-concurrency-scenarios-with-amazon-dynamodb)
+
+`#AWS #AmazonDynamoDB #APIGateway #AmazonCognito #Serverless #NoSQL #AWSStudyGroup #FCAJ`

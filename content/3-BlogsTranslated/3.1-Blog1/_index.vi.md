@@ -1,86 +1,108 @@
 ---
 title: "Blog 1"
-date: 2026-10-24
+date: 2026-11-16
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
 ---
 
-# Đừng để "độ chính xác 99%" đánh lừa: dự báo phân phối return và pinball loss
+# Mô hình chỉ chạy vài giây mỗi ngày: có cần đến SageMaker endpoint không?
 
-*Trịnh Tiến Khải · Nhóm CPAWS · Blog tự viết từ quá trình làm dự án*
+*Trịnh Tiến Khải · Bài đăng trên nhóm AWS Study Group: [CẬP NHẬT LINK SAU KHI ĐĂNG]*
 
-Khi bắt đầu dự án CPAWS (dự đoán giá vàng, bạc, dầu Brent và WTI trong 1–7 ngày tới), câu hỏi đầu tiên nhóm tôi phải trả lời không phải "dùng mô hình gì", mà là **"dự đoán cái gì và đo bằng cách nào"**. Bài này chia sẻ ba quyết định quan trọng nhất mà tôi rút ra: dự đoán return thay vì giá, dự đoán phân vị thay vì một con số, và luôn so với một mốc thống kê đủ mạnh.
+Gần đây mình tìm hiểu các cách chạy inference cho mô hình học máy trên AWS, và phát hiện một điều khá thú vị: với nhiều bài toán, câu hỏi quan trọng nhất không phải "mô hình gì" mà là "mô hình được gọi như thế nào". Bài này mình ghi lại những gì đọc được, kèm một sơ đồ ví dụ có đánh số từng luồng để dễ theo dõi.
 
-## 1. Cái bẫy của việc dự đoán mức giá
+![Batch inference hằng đêm bằng AWS Lambda container image](/images/3-Blog/blog1-lambda-batch-inference.png)
 
-Giả sử giá vàng hôm nay là 2.000 USD/ounce. Một "mô hình" lười nhất có thể nghĩ ra là: *giá ngày mai = giá hôm nay*. Vì giá vàng hiếm khi thay đổi quá 1–2% mỗi ngày, sai số phần trăm trung bình (MAPE) của mô hình này chỉ khoảng 1%. Báo cáo sẽ ghi "độ chính xác 99%", nghe rất ấn tượng, nhưng mô hình không biết gì về tương lai cả.
+*Hình 1. Sơ đồ ví dụ một pipeline batch inference hằng đêm, mình vẽ bằng draw.io dựa trên tài liệu AWS.*
 
-Nhiều bài toán dự báo giá trên mạng mắc đúng lỗi này: vẽ đường dự đoán gần như trùng đường giá thật, nhưng thực chất đường dự đoán chỉ là giá hôm qua dịch sang phải một ngày.
+**Tình huống:** một cửa hàng online muốn dự báo số đơn hàng ngày mai cho từng kho. Mỗi đêm chạy một lần sau khi chốt dữ liệu trong ngày, mô hình chạy vài giây, kết quả ghi vào database để dashboard đọc lại. Không ai cần mô hình trả lời theo từng cú click.
 
-**Cách nhóm tôi xử lý:** dự đoán **log return h phiên**:
+Phản xạ đầu tiên thường là "mô hình học máy thì lên SageMaker endpoint". Nhưng khi đọc kỹ cách tính tiền, mình thấy lựa chọn này không hợp với kiểu workload trên.
 
-```text
-r(t, h) = ln( P(t+h) / P(t) ),  h = 1..7
+## 1. Bốn cách chạy inference trên SageMaker
+
+- **Real-time endpoint:** tính tiền theo giờ instance trong suốt thời gian endpoint còn chạy, kể cả khi không có request nào. Hợp khi cần độ trễ thấp, lưu lượng đều, hoặc cần GPU.
+- **Serverless Inference:** tự về 0 khi rảnh, đổi lại có cold start. Bộ nhớ chọn từ 1 GB đến 6 GB và không có GPU.
+- **Asynchronous Inference:** request được đưa vào hàng đợi, hợp với payload lớn hoặc thời gian xử lý dài.
+- **Batch Transform:** chạy theo lô trên cả tập dữ liệu, xong thì tắt.
+
+Với job vài giây mỗi ngày, real-time endpoint gần như là trả tiền cho máy ngồi chờ. Batch Transform hay Serverless Inference dùng được, nhưng nếu mô hình nhỏ và chạy được bằng CPU thì còn một lựa chọn gọn hơn: AWS Lambda.
+
+## 2. Vì sao là Lambda container image, không phải gói zip
+
+- Gói zip của Lambda giới hạn 250 MB sau khi giải nén (tính cả layer). Bộ thư viện dữ liệu như pandas, pyarrow, scikit-learn cộng lại rất dễ chạm trần.
+- Container image cho phép tới 10 GB (chưa nén, tính cả các layer).
+- Timeout tối đa vẫn là 15 phút. Chuyển sang container không đổi giới hạn này.
+
+Điểm mình thích nhất: cùng một image chạy được ở máy local để test trước khi đẩy lên Amazon ECR, nên "chạy được ở máy mình" và "chạy được trên Lambda" là cùng một thứ.
+
+## 3. Đi theo 7 luồng trên sơ đồ
+
+1. Build image, ghim base image bằng digest, tag bằng commit SHA rồi đẩy lên Amazon ECR.
+2. EventBridge Scheduler chạy theo lịch cron mỗi đêm, gọi Lambda prepare theo kiểu bất đồng bộ.
+3. Lambda prepare gom và làm sạch dữ liệu, ghi vào S3 theo ngày (`data/dt=…/`).
+4. Prepare chạy xong, Lambda destination gọi tiếp Lambda inference. Có thể nối cả OnSuccess lẫn OnFailure: nếu một nguồn dữ liệu lỗi, inference vẫn chạy cho phần dữ liệu còn tốt.
+5. Lambda inference đọc dữ liệu và trọng số mô hình trong `models/`.
+6. Kết quả được ghi vào DynamoDB để dashboard hoặc API đọc lại.
+7. Log và metric đi về CloudWatch: một dòng log tổng kết mỗi lần chạy và một alarm trên metric Errors là đủ để sáng hôm sau biết đêm qua chạy ra sao.
+
+Ô đỏ góc dưới sơ đồ là phương án real-time endpoint chạy 24/7, không hợp với kiểu workload này.
+
+## 4. Những điều mình phát hiện khi đọc tài liệu
+
+**Mô hình nhỏ không nhất thiết phải mang cả framework lên Lambda.** Với các mô hình tuyến tính hoặc mạng nhỏ, có thể train ở nơi khác, xuất trọng số ra file (ví dụ `.npz`) rồi lúc dự báo chỉ cần NumPy để nhân ma trận. Image nhẹ hơn nhiều và khởi động nhanh hơn.
+
+**Base image không phải của AWS thì phải tự cài runtime interface client.** Base image của AWS (`public.ecr.aws/lambda/python`) có sẵn thành phần này. Nếu dùng image khác như `python:3.12-slim` thì phải cài `awslambdaric`, thiếu nó thì Lambda không gọi được handler.
+
+```dockerfile
+# Minh họa rút gọn
+FROM python:3.12-slim@sha256:<digest>
+WORKDIR /function
+COPY requirements.txt .
+RUN pip install --no-cache-dir awslambdaric -r requirements.txt
+COPY src/ ./src/
+ENTRYPOINT ["python", "-m", "awslambdaric"]
+CMD ["src.inference.handler"]
 ```
 
-Với target này, mô hình "giá không đổi" tương ứng với dự đoán return = 0, và mọi mô hình khác phải chứng minh nó học được sự thay đổi thật. Khi cần hiển thị, chúng tôi chỉ việc quy đổi ngược: `giá dự đoán = giá hiện tại × exp(r)`.
+Thêm một chi tiết mình phát hiện khi chạy thử: `awslambdaric` tìm module handler theo thư mục làm việc của container. Nếu thư mục làm việc không phải nơi chứa `src/`, Lambda báo `Runtime.ImportModuleError`. Vì vậy nên khai báo `WORKDIR` rõ ràng thay vì dựa vào mặc định của base image.
 
-Một chi tiết nhỏ nhưng quan trọng: *h phiên* tính theo **lịch giao dịch** của từng tài sản (NYSE cho quỹ GLD/SLV, CME cho dầu), không phải h ngày lịch. Nếu thiếu giá hợp lệ tại t hoặc t + h, hoặc giá ≤ 0 (như WTI ngày 20/4/2020), return được để là NaN thay vì tự điền.
+**Gọi bất đồng bộ thì Lambda tự thử lại.** Mặc định Lambda thử lại 2 lần khi function trả lỗi. Có thể chỉnh số lần thử lại từ 0 đến 2, và thời gian giữ event trong hàng đợi từ 60 giây đến 6 giờ. Với job inference, đặt retry bằng 0 thường hợp lý hơn: lỗi thì dừng, alarm báo, người vận hành đọc log rồi chạy lại có kiểm soát.
 
-## 2. Một con số là chưa đủ: dự đoán phân vị
+**Destinations chỉ áp dụng cho kiểu gọi bất đồng bộ.** Với lời gọi trực tiếp tới function, Lambda destinations chỉ áp dụng cho kiểu bất đồng bộ (ngoài ra event source mapping của Kinesis, DynamoDB Streams và Kafka có OnFailure destination riêng). Đích có thể là Lambda khác, SQS, SNS, EventBridge, hoặc S3 (riêng S3 chỉ dùng cho OnFailure). Cái bẫy dễ gặp: `aws lambda invoke` mặc định gọi đồng bộ (`RequestResponse`), nên chạy tay thì function đầu chạy xong nhưng destination không kích hoạt. Muốn chạy lại cả chuỗi phải gọi:
 
-Thị trường hàng hóa có độ bất định rất lớn. Nói "giá vàng tuần tới tăng 0,3%" là một thông tin gần như vô nghĩa nếu không kèm theo "nhưng có thể dao động từ −2% đến +2,6%". Vì vậy CPAWS dự đoán **7 phân vị** của return: 5%, 10%, 25%, 50%, 75%, 90%, 95%.
-
-Từ 7 phân vị này, web hiển thị:
-- **q50**: kịch bản trung tâm
-- **q10 – q90**: khoảng giá mà mô hình cho là có khoảng 80% khả năng chứa giá thật
-- **Xác suất tăng**: nội suy tuyến tính hàm phân phối tại return = 0, rồi kẹp trong [5%, 95%] để không bao giờ tuyên bố chắc chắn tuyệt đối
-
-Có một lỗi kỹ thuật thường gặp: mô hình học máy có thể xuất ra phân vị bị "chéo" (q10 lớn hơn q50). Chúng tôi xử lý bằng một hàm `normalize_quantiles()` sắp xếp lại các phân vị **đúng một lần**, ngay sau khi mô hình xuất kết quả trong Lambda dự đoán.
-
-## 3. Đo phân vị bằng pinball loss
-
-Không thể dùng MAE hay RMSE để chấm một dự đoán phân vị. Công cụ đúng là **pinball loss** (quantile loss). Với phân vị τ, dự đoán q và giá trị thật y:
-
-```text
-L_τ(y, q) = τ · (y − q)        nếu y ≥ q
-          = (1 − τ) · (q − y)  nếu y < q
+```bash
+aws lambda invoke --function-name <prepare> --invocation-type Event out.json
 ```
 
-Ý nghĩa trực quan: với τ = 0,9, nếu giá thật vượt q90 thì bị phạt nặng (hệ số 0,9), còn nếu giá thật thấp hơn q90 thì chỉ bị phạt nhẹ (hệ số 0,1). Nhờ vậy, q90 tối ưu sẽ là mức mà giá thật chỉ vượt qua khoảng 10% số lần. Pinball loss là một *proper scoring rule*: mô hình chỉ đạt điểm tốt nhất khi báo đúng niềm tin của nó.
+## 5. Chi phí
 
-Bên cạnh pinball loss, chúng tôi theo dõi các chỉ số hiệu chỉnh:
-- **coverage_80**: tỷ lệ giá thật nằm trong khoảng q10–q90, lý tưởng là gần 80%
-- **width_80**: độ rộng khoảng; khoảng rộng vô hạn thì coverage 100% nhưng vô dụng
-- **Brier skill** cho xác suất tăng
+Lambda có free tier 1 triệu request và 400.000 GB-giây mỗi tháng, không hết hạn sau 12 tháng như nhiều dịch vụ khác (tính chung cho cả tài khoản). Ví dụ một function 1 GB, giả sử lần nào cũng chạy hết 120 giây, mỗi đêm một lần thì một tháng chỉ khoảng 3.600 GB-giây, chưa tới 1% free tier. ECR tính phí lưu trữ image theo dung lượng, nên đặt lifecycle policy để chỉ giữ vài image gần nhất.
 
-## 4. Luôn so với một mốc đủ mạnh
+## Khi nào chọn gì
 
-Mốc "return = 0" quá yếu cho bài toán phân vị, vì nó không nói gì về độ biến động. Mốc chúng tôi chọn là **phân vị thực nghiệm của 252 return gần nhất** (khoảng một năm giao dịch), tính nhân quả: tại thời điểm t chỉ dùng các return đã kết thúc trước t.
+| Kiểu workload | Lựa chọn |
+|---|---|
+| Chạy theo lô thưa, mô hình nhỏ, chạy bằng CPU, dưới 15 phút | Lambda container image |
+| Lưu lượng thất thường, chấp nhận cold start, không cần GPU | SageMaker Serverless Inference |
+| Payload lớn hoặc xử lý lâu | SageMaker Asynchronous Inference |
+| Chấm điểm cả tập dữ liệu lớn theo lô | SageMaker Batch Transform |
+| Cần độ trễ mili-giây liên tục, mô hình lớn hoặc cần GPU | SageMaker real-time endpoint |
 
-Chỉ số chính là:
+## Kết luận
 
-```text
-pinball_skill = 1 − loss_mô_hình / loss_mốc_252
-```
+Chọn dịch vụ theo cách workload thật sự chạy, không theo cái nhãn "đây là bài toán ML". Với một job dự báo vài giây mỗi đêm, Lambda container image đủ chỗ cho thư viện, chạy được y hệt ở local và gần như không tốn tiền. Phần còn lại là nắm rõ kiểu gọi (đồng bộ hay bất đồng bộ), vì nhiều tính năng của Lambda như destinations hay retry chỉ áp dụng cho một kiểu.
 
-`pinball_skill > 0` nghĩa là mô hình tốt hơn mốc. Nhóm đặt quy tắc chặt hơn: mô hình học máy chỉ được thay mốc khi **cận dưới khoảng tin cậy 95%** của pinball skill lớn hơn 0, và khi so hai mô hình thì dùng thêm kiểm định Diebold–Mariano.
+*Lưu ý: giá và giới hạn dịch vụ có thể thay đổi, nên kiểm lại trang AWS Pricing và tài liệu mới nhất trước khi áp dụng. Đoạn Dockerfile là minh họa rút gọn.*
 
-## 5. Kết quả thật và bài học
+### Tài liệu tham khảo
 
-Trên tập validation năm 2019, DLinear (mô hình học máy đầu tiên của nhóm, chỉ dùng giá với cửa sổ 60 phiên) **thua mốc 252 phiên ở cả 28/28 nhóm** (4 tài sản × 7 tầm dự báo). Đây là một kết quả đáng thất vọng nhưng rất có giá trị. Nếu chúng tôi đo bằng MAPE trên giá, DLinear vẫn sẽ "đạt 99%" và có thể đã được đưa vào sản phẩm.
+- [Lambda quotas](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)
+- [Create a Lambda function using a container image](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
+- [Lambda asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html)
+- [AWS Lambda pricing](https://aws.amazon.com/lambda/pricing/)
+- [SageMaker Serverless Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html)
+- [Inference options in Amazon SageMaker AI](https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html)
 
-Vì vậy sản phẩm hiện dùng mốc thống kê 252 phiên, ghi rõ "Mốc thống kê 252 phiên" trên web và trong câu trả lời của chatbot; DLinear được giữ làm challenger.
-
-**Ba điều tôi mang theo sau dự án:**
-1. Chọn target và chỉ số đánh giá quan trọng hơn chọn mô hình.
-2. Một mốc thống kê đơn giản, được đánh giá trung thực, đáng tin hơn một mô hình phức tạp không chứng minh được hiệu quả.
-3. Hiển thị độ bất định (khoảng dự đoán) là một cách tôn trọng người dùng.
-
-## Tài liệu tham khảo
-
-- Gneiting, T. & Raftery, A. (2007). [Strictly Proper Scoring Rules, Prediction, and Estimation](https://doi.org/10.1198/016214506000001437). *JASA*.
-- Hyndman, R. & Athanasopoulos, G. [Forecasting: Principles and Practice (3rd ed.)](https://otexts.com/fpp3/)
-- Zeng, A. et al. (2022). [Are Transformers Effective for Time Series Forecasting? (DLinear)](https://arxiv.org/abs/2205.13504)
-- Harvey, D., Leybourne, S. & Newbold, P. (1997). [Testing the equality of prediction mean squared errors](https://doi.org/10.1016/S0169-2070%2896%2900719-4). *IJF*.
+`#AWS #AWSLambda #AmazonECR #AmazonSageMaker #Serverless #MLOps #AWSStudyGroup #FCAJ`

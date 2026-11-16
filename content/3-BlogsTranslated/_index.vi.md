@@ -1,21 +1,21 @@
 ---
-title: "Blog kỹ thuật"
+title: "Các bài blog đã đăng"
 date: 2026-09-08
 weight: 3
 chapter: false
 pre: " <b> 3. </b> "
 ---
 
-Ba bài blog dưới đây do tôi tự viết, tổng hợp kiến thức đã học và nghiên cứu trong quá trình làm phần mô hình và hạ tầng của dự án CPAWS.
+Ba bài blog dưới đây do tôi tự viết từ những gì đã học về các dịch vụ AWS trong quá trình làm dự án CPAWS, và đăng lên nhóm cộng đồng [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj). Mỗi bài dùng một ví dụ riêng và một sơ đồ tự vẽ bằng draw.io.
 
-### [Blog 1 - Đừng để "độ chính xác 99%" đánh lừa: dự báo phân phối return và pinball loss](3.1-Blog1/)
+### [Blog 1 - Mô hình chỉ chạy vài giây mỗi ngày: có cần đến SageMaker endpoint không?](3.1-Blog1/)
 
-Vì sao dự đoán mức giá tạo ra độ chính xác ảo, cách chuyển sang dự đoán 7 phân vị của log return, chấm điểm bằng pinball loss và so với mốc phân vị 252 phiên. Bài kết thúc bằng kết quả thật: DLinear thua mốc thống kê ở 28/28 nhóm trên tập validation 2019 và bài học rút ra.
+So sánh bốn cách chạy inference trên SageMaker với AWS Lambda container image cho một job dự báo chạy mỗi đêm: giới hạn gói zip và container, 7 luồng của pipeline (ECR, EventBridge Scheduler, Lambda destinations, S3, DynamoDB, CloudWatch), retry khi gọi bất đồng bộ và chi phí.
 
-### [Blog 2 - Năm cái bẫy rò rỉ dữ liệu tương lai khi dự báo chuỗi thời gian tài chính](3.2-Blog2/)
+### [Blog 2 - Amazon S3 Versioning: tái lập kết quả xử lý dữ liệu khi file bị ghi đè](3.2-Blog2/)
 
-Tổng hợp năm cách thông tin tương lai lọt vào mô hình: CEEMDAN trên toàn chuỗi, chuẩn hóa sai, gắn tin tức theo ngày sự kiện thay vì ngày công bố, forward-fill target qua ngày nghỉ của sàn, và dùng tập test nhiều lần. Mỗi bẫy kèm cách xử lý và một mẫu test tự động.
+Tổ chức data lake theo tầng, cách S3 Versioning giữ phiên bản cũ, ghim dữ liệu đầu vào bằng VersionId và SHA-256 trước một lần đánh giá, quyền `s3:GetObjectVersion` và lifecycle cho phiên bản cũ.
 
-### [Blog 3 - Dự đoán theo lô serverless trên AWS: EventBridge Scheduler, Lambda container và DynamoDB](3.3-Blog3/)
+### [Blog 3 - Thiết kế bảng DynamoDB: bắt đầu từ câu hỏi, không phải từ dữ liệu](3.3-Blog3/)
 
-Cách xây luồng dự đoán hằng ngày không có tài nguyên chạy 24/7: lịch chạy bằng EventBridge Scheduler, nối Lambda bằng Lambda Destinations, suy luận NumPy trong container image, thiết kế bảng DynamoDB theo truy vấn và ước tính chi phí.
+Chọn partition key và sort key từ các câu hỏi của ứng dụng, đọc bản mới nhất bằng Query `Limit=1`, gom một lần dự báo vào một item, và ghi có điều kiện để job chạy lại không ghi đè dữ liệu.

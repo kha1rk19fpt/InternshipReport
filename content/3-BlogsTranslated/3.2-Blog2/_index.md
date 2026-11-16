@@ -1,90 +1,138 @@
 ---
 title: "Blog 2"
-date: 2026-11-07
+date: 2026-11-16
 weight: 2
 chapter: false
 pre: " <b> 3.2. </b> "
 ---
 
-# Five Look-Ahead Leakage Traps in Financial Time-Series Forecasting
+# Amazon S3 Versioning: Reproducing Data Processing Results When Files Get Overwritten
 
-*Trịnh Tiến Khải · CPAWS team · Self-written from my project work*
+*Trinh Tien Khai · Posted in the AWS Study Group: [LINK TO BE ADDED AFTER POSTING]*
 
-In time-series forecasting, **look-ahead leakage** happens when a model accidentally sees information that would not be available at real forecast time. The result is a suspiciously good backtest followed by a collapse in production. While building the model for CPAWS, I ran into, or nearly ran into, all five traps below. This post collects them so others working on similar projects can avoid them.
+A business may run a data pipeline every night: download sales data, clean it, then write it to Amazon S3. The data source sometimes corrects figures from a few days earlier, so the pipeline has to reload and overwrite the old files. A few months later, when a model evaluation needs to be checked again, the question "which data did that run use?" becomes hard to answer, because the file name is the same but the content has changed.
 
-The whole rule fits in one sentence: **at forecast time t, use only information truly known at t.** The difficulty is that future information usually sneaks in very quietly.
+Amazon S3 Versioning keeps old versions of an object when it is overwritten or deleted. Combined with recording the VersionId and the SHA-256 hash before every important run, a business can reproduce the exact input data of any processing run.
 
-## Trap 1: Decomposing the Whole Series
+![S3 data lake and S3 Versioning](/images/3-Blog/blog2-s3-versioning.png)
 
-Our main model uses **CEEMDAN** to split the price series into oscillating components (IMFs) and a trend. A common approach in papers is to run CEEMDAN once on the entire series and only then split train/test.
+*Figure 1. Example diagram: pinning the exact data version to reproduce a run, drawn by me in draw.io based on AWS documentation.*
 
-The problem: CEEMDAN is a global decomposition. The IMF value at day t depends on days after t. Using it as a feature means indirectly seeing the future, and the backtest looks artificially good.
+## 1. How the data is organized
 
-**Fix:** run CEEMDAN on a **rolling window**: at each t, decompose only the price segment ending at t and take only the last value of each IMF as a feature. This is far more expensive, so the team caches IMF results on S3. The years 2012–2013 are reserved to "warm up" the window.
+Instead of storing everything in one place, the bucket is split into layers by processing stage:
 
-## Trap 2: Scaling with Whole-Dataset Statistics
+| Layer | Content |
+|---|---|
+| `raw/` | Original downloaded data, kept as is, never modified. |
+| `clean/<dataset>/dt=YYYY-MM-DD/` | Cleaned data, partitioned by date. |
+| `features/` | Precomputed features for reuse. |
+| `models/<name>/<version>/` | Model weights, configuration and manifest. |
+| `eval/` | Evaluation results, stored as Parquet. |
 
-`StandardScaler().fit(X)` on all data before splitting train/validation is a classic mistake: the mean and standard deviation already contain future information.
+For example, if an evaluation result looks abnormal, you can trace back from `eval/` to `clean/` and then to `raw/` to find which step went wrong. Rows rejected during cleaning should not be deleted either, but moved to a separate file (for example `rejected.parquet`) so the reason can be checked later.
 
-**Fix:** fit the scaler only on the training set (2014–2018), store its parameters in the model artifact (`scaler.json`), and reuse exactly those parameters for validation, test and real prediction in Lambda.
+## 2. How S3 Versioning works
 
-## Trap 3: Dating News and Indices by Event Date Instead of Publication Date
+A bucket has three states: unversioned, enabled and suspended. Once enabled, it can never return to unversioned; it can only be suspended.
 
-This is the sneakiest trap. For example:
-- FOMC minutes are published about three weeks after the meeting. Attaching them to the meeting date lets the model read them three weeks early.
-- The Geopolitical Risk (GPR) index is updated periodically; a day's value only exists after its publication.
-- A release published after the market close only affects the next trading session.
+With Versioning enabled, each object has its own version ID:
 
-**Fix:** every signal source has a **publication-time** rule (in code, `PUBLISHED_AT_RULES`). A signal is used only from the first trading session after publication. More importantly, training and prediction share **the same feature builder** with the same rules, so the backtest and the product never run different logic.
+| Operation | Result |
+|---|---|
+| Overwrite the same key | The new version becomes current; the old one becomes noncurrent but stays intact. |
+| Delete without a VersionId | S3 only adds a delete marker; older versions remain. |
+| GetObject without a VersionId | Returns the current version. |
+| GetObject with a VersionId | Returns exactly the specified version. |
+| Object written before Versioning was enabled | Has the version ID "null" and can still be read with that ID. |
 
-## Trap 4: Trading Calendars and Forward-Filling
+## 3. How the process works
 
-Assets on different exchanges have different holidays. A real case we hit: on 5/12/2018 NYSE was closed (national day of mourning) while CME energy was still trading — yet our data source was missing that session for Brent and WTI.
+The example architecture has these main steps:
 
-The natural reflex is to forward-fill. But forward-filling the **target** teaches the model fake "return = 0" days, followed by a return that spans two sessions. Both distort the distribution.
+1. **Collect data:** AWS Lambda pulls data from an external API and the operational database.
+2. **Store the original data:** the downloaded data is written to `raw/` and kept as is. This is the final reference point if later steps fail.
+3. **Clean the data:** cleaned data is written to `clean/<dataset>/dt=…/`. If a source fails, the system keeps the old data and flags it as "stale" instead of overwriting it with incomplete data.
+4. **Daily processing:** the daily job reads the current version with GetObject without a VersionId, because this flow always needs the latest data.
+5. **Pin the data version:** before an important run, such as a model evaluation, each input file is "pinned" by recording its key, VersionId and SHA-256 in a run plan.
+6. **Read exactly the pinned version:** the runner reads the file with GetObject and the VersionId, then checks the SHA-256 before computing.
+7. **Store the results:** results are written as Parquet to `eval/`.
 
-**Fix:**
-- Use `pandas_market_calendars` to define each asset's valid sessions; t + h follows that asset's own calendar
-- **Never forward-fill the target**; missing rows are flagged and excluded from evaluation, accepting some lost samples (the 5/12/2018 gap flags about 301 oil rows in the 2019 validation set as having an invalid input window)
-- Drop the current day's bar (New York time) because the session has not closed
+Steps 4 and 6 read the same key but answer two different questions: step 4 asks "what is the data now", while step 6 asks "what was the data when it was pinned".
 
-## Trap 5: Using the Test Set More Than Once
+## 4. Role of each component
 
-Leakage lives not only in code but also in **process**. If we tweak parameters after each look at the test results, the test set becomes a second validation set and the reported number is no longer an honest estimate.
+| Component | Role |
+|---|---|
+| AWS Lambda | Collect and clean data |
+| Amazon S3 | Store data in the `raw/`, `clean/`, `features/`, `models/`, `eval/` layers |
+| S3 Versioning | Keep old versions when objects are overwritten or deleted |
+| Run plan | Record the key, VersionId and SHA-256 of the input data |
+| Evaluation runner | Read exactly the pinned version and check integrity |
+| IAM | Grant permission to read the current version or a specific version |
+| S3 Lifecycle | Clean up old versions to control cost |
 
-**Our process:**
-- A fixed split: 2014–2018 train, 2019 validation, 2020 → present test
-- Every choice (window, architecture, signals kept) is based only on validation
-- The test set is **run only once** after parameters are locked, with the configuration and commit recorded beforehand
-- The same principle applies to the chatbot test set: never tweak the prompt and re-score on the same questions
+## 5. System design issues worth noting
 
-## Checking with Automated Tests
+### Pin with both the VersionId and SHA-256
 
-"I was careful" is not enough. A simple but effective test I wrote for the feature builder:
+The VersionId tells you which object to read on S3, while SHA-256 proves the content is exactly what was pinned, even after the file has been downloaded and copied elsewhere. The VersionId can be taken from the PutObject or HeadObject response once the bucket has Versioning enabled.
+
+Sample code for reading a pinned version:
 
 ```python
-def test_features_do_not_use_future(prices):
-    t = prices.index[-30]
-    full = build_features(prices).loc[t]
-    # replace all data after t with garbage
-    tampered = prices.copy()
-    tampered.loc[tampered.index > t] = 1e9
-    cut = build_features(tampered).loc[t]
-    # features at t must not change
-    assert np.allclose(full, cut, equal_nan=True)
+import hashlib
+import boto3
+
+s3 = boto3.client("s3")
+
+def read_pinned(bucket: str, key: str, version_id: str, expected_sha256: str) -> bytes:
+    # Read exactly the pinned version, not the latest one
+    obj = s3.get_object(Bucket=bucket, Key=key, VersionId=version_id)
+    body = obj["Body"].read()
+    if hashlib.sha256(body).hexdigest() != expected_sha256:
+        raise RuntimeError(f"SHA-256 mismatch: {key}")
+    return body
 ```
 
-If features at t change when future data changes, there is definitely leakage.
+### S3's built-in checksums do not replace a self-computed SHA-256
 
-## Conclusion
+S3 also stores checksums for objects: if an upload has no checksum, S3 adds a CRC64NVME checksum for the whole object. You can choose SHA-256 when uploading, but for multipart uploads SHA-256 is only available as a composite checksum (built from the checksums of each part), so it cannot be compared directly with a SHA-256 of the whole file. In addition, S3 returns checksums as the base64 of the digest, unlike the hex string returned by `hashlib.hexdigest()`. So computing SHA-256 on the client side is still the most reliable way to pin.
 
-Look-ahead leakage rarely comes from an obviously wrong line of code; it comes from hidden assumptions about time. The three habits that helped me most: always ask "when is this information available?", share one function between training and prediction, and write tests that deliberately corrupt future data.
+### IAM permissions for reading by version
 
-## References
+The `s3:GetObject` permission is only enough to read the current version. Reading a specific version by VersionId requires `s3:GetObjectVersion`, a separate permission not included in `s3:GetObject`. Listing versions also requires `s3:ListBucketVersions`. Without them, the runner gets AccessDenied even though the daily flow keeps working normally.
 
-- Torres, M. E. et al. (2011). [A complete ensemble empirical mode decomposition with adaptive noise](https://doi.org/10.1109/ICASSP.2011.5947265). *ICASSP*.
-- [PyEMD documentation (CEEMDAN)](https://pyemd.readthedocs.io/)
-- [pandas_market_calendars](https://github.com/rsheftel/pandas_market_calendars)
-- [Federal Reserve – FOMC meeting calendars, statements and minutes](https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm)
-- [Geopolitical Risk (GPR) Index](https://www.matteoiacoviello.com/gpr.htm)
-- [scikit-learn – Common pitfalls: data leakage](https://scikit-learn.org/stable/common_pitfalls.html)
+### Storage cost
+
+Every version is billed for storage like a normal object, so a versioned bucket grows over time. A lifecycle rule with `NoncurrentVersionExpiration` can delete old versions after a number of days, combined with `NewerNoncurrentVersions` to always keep the N most recent versions. However, make sure the rule does not delete pinned versions while they are still needed for reproduction.
+
+## 6. System design lessons
+
+S3 Versioning shows that "keeping old data" and "being able to reproduce results" are two different things. Versioning only keeps versions; to reproduce, the system must actively record which version was used.
+
+A reproducible pipeline follows this flow:
+
+```text
+Data Source → raw/ → clean/ → Pin (VersionId + SHA-256) → Evaluation → eval/
+```
+
+Before every important run, check:
+
+- Was Versioning enabled before the overwrites or deletions you need to keep?
+- Were the key, VersionId and SHA-256 recorded in the run plan before running?
+- Does the runner's role have `s3:GetObjectVersion`?
+- Could a lifecycle rule delete a pinned version?
+- Were the code and configuration (commit SHA, config file hash) pinned together with the data? Correct data with different code still gives different results.
+
+A note for current deployments: since 5 January 2023, Amazon S3 automatically encrypts all new objects with SSE-S3 and this cannot be turned off, so when designing a bucket you only need to block public access, accept HTTPS only, and decide whether to switch to SSE-KMS. Also, objects that existed before Versioning was enabled can still be pinned with VersionId "null", but versions overwritten before it was enabled are already lost.
+
+### AWS References
+
+- [How S3 Versioning works](https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html)
+- [Retrieving object versions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RetrievingObjectVersions.html)
+- [Deleting object versions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html)
+- [GetObject API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html)
+- [Checking object integrity](https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html)
+- [Managing the lifecycle of objects](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html)
+- [Default encryption FAQ](https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html)

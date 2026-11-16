@@ -1,90 +1,138 @@
 ---
 title: "Blog 2"
-date: 2026-11-07
+date: 2026-11-16
 weight: 2
 chapter: false
 pre: " <b> 3.2. </b> "
 ---
 
-# Năm cái bẫy rò rỉ dữ liệu tương lai khi dự báo chuỗi thời gian tài chính
+# Amazon S3 Versioning: tái lập kết quả xử lý dữ liệu khi file bị ghi đè
 
-*Trịnh Tiến Khải · Nhóm CPAWS · Blog tự viết từ quá trình làm dự án*
+*Trịnh Tiến Khải · Bài đăng trên nhóm AWS Study Group: [CẬP NHẬT LINK SAU KHI ĐĂNG]*
 
-Trong dự báo chuỗi thời gian, **rò rỉ dữ liệu tương lai** (look-ahead leakage) là khi mô hình vô tình được nhìn thấy thông tin mà ở thời điểm dự đoán thật sự chưa thể có. Kết quả là backtest đẹp bất thường, nhưng khi chạy thật thì mô hình sụp đổ. Khi làm phần mô hình cho dự án CPAWS, tôi gặp hoặc suýt gặp cả năm cái bẫy dưới đây. Bài này tổng hợp lại để các bạn làm dự án tương tự tránh được.
+Một doanh nghiệp có thể chạy pipeline dữ liệu mỗi đêm: tải dữ liệu bán hàng, làm sạch rồi ghi vào Amazon S3. Nguồn dữ liệu đôi khi sửa số liệu của vài ngày trước, nên pipeline phải tải lại và ghi đè lên file cũ. Vài tháng sau, khi cần kiểm tra lại một lần đánh giá mô hình, câu hỏi "lần đó đã dùng dữ liệu nào?" trở nên khó trả lời, vì tên file vẫn vậy nhưng nội dung đã khác.
 
-Nguyên tắc chung chỉ có một câu: **tại thời điểm dự đoán t, chỉ được dùng thông tin thực sự đã biết tại t.** Cái khó là thông tin tương lai thường lọt vào theo những cách rất kín đáo.
+Amazon S3 Versioning giữ lại các phiên bản cũ của object khi bị ghi đè hoặc xóa. Kết hợp với việc ghi lại VersionId và mã băm SHA-256 trước mỗi lần chạy quan trọng, doanh nghiệp có thể tái lập chính xác dữ liệu đầu vào của bất kỳ lần xử lý nào.
 
-## Bẫy 1: Phân rã tín hiệu trên toàn bộ chuỗi
+![S3 data lake và S3 Versioning](/images/3-Blog/blog2-s3-versioning.png)
 
-Mô hình chính của nhóm dùng **CEEMDAN** để tách chuỗi giá thành các thành phần dao động (IMF) và xu hướng. Cách làm phổ biến trong nhiều bài báo là chạy CEEMDAN một lần trên toàn bộ chuỗi, rồi mới chia train/test.
+*Hình 1. Sơ đồ ví dụ: ghim đúng phiên bản dữ liệu để tái lập một lần chạy, mình vẽ bằng draw.io dựa trên tài liệu AWS.*
 
-Vấn đề: CEEMDAN là phép phân rã toàn cục. Giá trị IMF tại ngày t phụ thuộc vào cả những ngày sau t. Dùng IMF này làm đặc trưng tức là gián tiếp nhìn thấy tương lai, và kết quả backtest sẽ tốt một cách giả tạo.
+## 1. Tổng quan cách tổ chức dữ liệu
 
-**Cách xử lý:** chạy CEEMDAN theo **cửa sổ trượt**: tại mỗi t, chỉ phân rã đoạn giá kết thúc tại t, và chỉ lấy giá trị cuối cùng của mỗi IMF làm đặc trưng. Cách này tốn tính toán hơn rất nhiều, nên nhóm cache kết quả IMF lên S3 để không phải chạy lại. Năm 2012–2013 được dành riêng để "khởi động" cửa sổ.
+Thay vì lưu mọi thứ chung một chỗ, bucket được chia thành các tầng theo mức độ xử lý:
 
-## Bẫy 2: Chuẩn hóa bằng thống kê của cả tập dữ liệu
+| Tầng | Nội dung |
+|---|---|
+| `raw/` | Dữ liệu gốc tải về, giữ nguyên, không sửa. |
+| `clean/<dataset>/dt=YYYY-MM-DD/` | Dữ liệu đã làm sạch, phân vùng theo ngày. |
+| `features/` | Đặc trưng tính sẵn để dùng lại. |
+| `models/<name>/<version>/` | Trọng số, cấu hình và manifest của mô hình. |
+| `eval/` | Kết quả đánh giá, lưu dạng Parquet. |
 
-`StandardScaler().fit(X)` trên toàn bộ dữ liệu rồi mới chia train/validation là lỗi kinh điển: trung bình và độ lệch chuẩn đã chứa thông tin của tương lai.
+Ví dụ, nếu kết quả đánh giá bất thường, có thể lần ngược từ `eval/` về `clean/` rồi về `raw/` để biết lỗi nằm ở bước nào. Dòng dữ liệu bị loại khi làm sạch cũng không nên xóa mà chuyển sang một file riêng (ví dụ `rejected.parquet`) để kiểm tra lại lý do.
 
-**Cách xử lý:** chỉ `fit` scaler trên tập train (2014–2018), lưu tham số vào artifact của mô hình (`scaler.json`), rồi dùng đúng tham số đó cho validation, test và khi dự đoán thật trong Lambda.
+## 2. Cách S3 Versioning hoạt động
 
-## Bẫy 3: Tin tức và chỉ số được gắn theo ngày sự kiện, không theo ngày công bố
+Một bucket có ba trạng thái: chưa bật (unversioned), đã bật (enabled) và tạm dừng (suspended). Khi đã bật thì không thể quay về trạng thái chưa bật, chỉ có thể tạm dừng.
 
-Đây là bẫy kín đáo nhất. Ví dụ:
-- Biên bản họp FOMC được công bố khoảng ba tuần sau cuộc họp. Nếu gắn biên bản vào ngày họp, mô hình đã đọc được nó sớm ba tuần.
-- Chỉ số rủi ro địa chính trị GPR được cập nhật định kỳ; giá trị của một ngày chỉ có sau ngày công bố.
-- Thông cáo được đăng sau giờ đóng cửa thị trường chỉ ảnh hưởng đến phiên giao dịch kế tiếp.
+Khi Versioning được bật, mỗi object có một version ID riêng:
 
-**Cách xử lý:** mỗi nguồn tín hiệu có một quy tắc về **thời điểm công bố** (trong code là `PUBLISHED_AT_RULES`). Tín hiệu chỉ được dùng cho phiên giao dịch đầu tiên sau thời điểm công bố. Quan trọng hơn: train và predict dùng **chung một hàm tạo đặc trưng** với chung bộ quy tắc, để không có chuyện backtest dùng một logic còn sản phẩm dùng logic khác.
+| Thao tác | Kết quả |
+|---|---|
+| Ghi đè cùng một key | Bản mới thành current, bản cũ thành noncurrent nhưng vẫn còn nguyên. |
+| Xóa không kèm VersionId | S3 chỉ đặt một delete marker, các phiên bản cũ vẫn còn. |
+| GetObject không kèm VersionId | Trả về bản current. |
+| GetObject kèm VersionId | Trả về đúng phiên bản được chỉ định. |
+| Object ghi trước khi bật Versioning | Có version ID là "null" và vẫn đọc lại được theo ID này. |
 
-## Bẫy 4: Lịch giao dịch và forward-fill
+## 3. Quy trình hoạt động
 
-Các tài sản giao dịch trên những sàn khác nhau có lịch nghỉ khác nhau. Một ví dụ thực tế nhóm gặp: ngày 5/12/2018, sàn NYSE đóng cửa (quốc tang), trong khi sàn năng lượng CME vẫn giao dịch, nhưng nguồn dữ liệu lại thiếu phiên này của dầu Brent và WTI.
+Kiến trúc ví dụ được chia thành các bước chính:
 
-Phản xạ tự nhiên là forward-fill cho đủ ngày. Nhưng nếu forward-fill **target**, mô hình sẽ học được những ngày "return = 0" giả, và ngày sau đó lại có một return gộp hai phiên. Cả hai đều sai lệch phân phối.
+1. **Thu thập dữ liệu:** AWS Lambda lấy dữ liệu từ API bên ngoài và database nghiệp vụ.
+2. **Lưu dữ liệu gốc:** dữ liệu tải về được ghi vào `raw/` và giữ nguyên. Đây là điểm tham chiếu cuối cùng nếu các bước sau có lỗi.
+3. **Làm sạch dữ liệu:** dữ liệu sau khi làm sạch được ghi vào `clean/<dataset>/dt=…/`. Nếu một nguồn bị lỗi, hệ thống giữ dữ liệu cũ và gắn cờ "stale" thay vì ghi đè bằng dữ liệu thiếu.
+4. **Xử lý hằng ngày:** job hằng ngày đọc bản hiện tại bằng GetObject không kèm VersionId, vì luồng này luôn cần dữ liệu mới nhất.
+5. **Ghim phiên bản dữ liệu:** trước một lần chạy quan trọng, chẳng hạn đánh giá mô hình, từng file đầu vào được "ghim" bằng cách ghi key, VersionId và SHA-256 vào một kế hoạch chạy (run plan).
+6. **Đọc đúng phiên bản đã ghim:** runner đọc file bằng GetObject kèm VersionId, sau đó kiểm tra SHA-256 trước khi tính toán.
+7. **Lưu kết quả:** kết quả được ghi dạng Parquet vào `eval/`.
 
-**Cách xử lý:**
-- Dùng `pandas_market_calendars` để xác định phiên hợp lệ của từng tài sản; t + h được tính theo lịch của chính tài sản đó
-- **Không forward-fill target**; dòng thiếu được gắn cờ và loại khỏi đánh giá, chấp nhận mất một số mẫu (với lỗ hổng 5/12/2018, khoảng 301 dòng dầu trong validation 2019 bị gắn cờ cửa sổ đầu vào không hợp lệ)
-- Bỏ thanh giá của ngày hiện tại (theo giờ New York) vì phiên chưa đóng cửa
+Bước 4 và Bước 6 cùng đọc một key nhưng trả lời hai câu hỏi khác nhau: Bước 4 hỏi "bây giờ dữ liệu là gì", còn Bước 6 hỏi "lúc ghim, dữ liệu là gì".
 
-## Bẫy 5: Dùng tập test nhiều lần
+## 4. Vai trò của các thành phần
 
-Rò rỉ không chỉ nằm trong code mà còn trong **quy trình**. Nếu sau mỗi lần xem kết quả test, ta quay lại chỉnh tham số, thì tập test đã trở thành tập validation thứ hai và con số báo cáo không còn là ước lượng trung thực.
+| Thành phần | Vai trò |
+|---|---|
+| AWS Lambda | Thu thập và làm sạch dữ liệu |
+| Amazon S3 | Lưu dữ liệu theo tầng `raw/`, `clean/`, `features/`, `models/`, `eval/` |
+| S3 Versioning | Giữ lại phiên bản cũ khi object bị ghi đè hoặc xóa |
+| Run plan | Ghi lại key, VersionId và SHA-256 của dữ liệu đầu vào |
+| Runner đánh giá | Đọc đúng phiên bản đã ghim và kiểm tra tính toàn vẹn |
+| IAM | Cấp quyền đọc bản hiện tại hoặc đọc theo phiên bản |
+| S3 Lifecycle | Dọn dẹp phiên bản cũ để kiểm soát chi phí |
 
-**Cách xử lý của nhóm:**
-- Chia cố định: 2014–2018 train, 2019 validation, 2020 → nay test
-- Mọi lựa chọn (cửa sổ, kiến trúc, tín hiệu giữ lại) chỉ dựa trên validation
-- Tập test **chỉ chạy một lần** sau khi khóa tham số, với cấu hình và commit được ghi lại trước khi chạy
-- Nguyên tắc tương tự áp dụng cho bộ câu hỏi kiểm thử chatbot: không sửa prompt rồi chấm lại trên cùng bộ câu hỏi
+## 5. Một số vấn đề System Design đáng chú ý
 
-## Kiểm tra bằng test tự động
+### Ghim bằng cả VersionId và SHA-256
 
-Lời hứa "tôi cẩn thận rồi" là không đủ. Một kiểu test đơn giản nhưng hiệu quả mà tôi viết cho hàm tạo đặc trưng:
+VersionId cho biết cần đọc object nào trên S3, còn SHA-256 chứng minh nội dung đúng như lúc ghim, kể cả khi file đã được tải về rồi chép sang nơi khác. VersionId có thể lấy từ phản hồi của PutObject hoặc HeadObject khi bucket đã bật Versioning.
+
+Đoạn code minh họa cách đọc một phiên bản đã ghim:
 
 ```python
-def test_features_do_not_use_future(prices):
-    t = prices.index[-30]
-    full = build_features(prices).loc[t]
-    # thay toàn bộ dữ liệu sau t bằng giá trị vô nghĩa
-    tampered = prices.copy()
-    tampered.loc[tampered.index > t] = 1e9
-    cut = build_features(tampered).loc[t]
-    # đặc trưng tại t không được thay đổi
-    assert np.allclose(full, cut, equal_nan=True)
+import hashlib
+import boto3
+
+s3 = boto3.client("s3")
+
+def read_pinned(bucket: str, key: str, version_id: str, expected_sha256: str) -> bytes:
+    # Lấy đúng phiên bản đã ghim, không phải bản mới nhất
+    obj = s3.get_object(Bucket=bucket, Key=key, VersionId=version_id)
+    body = obj["Body"].read()
+    if hashlib.sha256(body).hexdigest() != expected_sha256:
+        raise RuntimeError(f"SHA-256 không khớp: {key}")
+    return body
 ```
 
-Nếu đặc trưng tại t thay đổi khi dữ liệu tương lai thay đổi, chắc chắn có rò rỉ.
+### Checksum có sẵn của S3 chưa thay thế được SHA-256 tự tính
 
-## Kết luận
+S3 cũng tự lưu checksum cho object: nếu upload không kèm checksum, S3 tự gắn checksum CRC64NVME cho cả object. Có thể chọn SHA-256 khi upload, nhưng với multipart upload thì SHA-256 chỉ có dạng composite (ghép từ checksum của từng phần), nên không so trực tiếp được với SHA-256 tính trên cả file. Ngoài ra, S3 trả checksum ở dạng base64 của digest, khác chuỗi hex mà `hashlib.hexdigest()` trả về. Vì vậy, tự tính SHA-256 phía client vẫn là cách chắc chắn nhất để ghim.
 
-Rò rỉ dữ liệu tương lai hiếm khi đến từ một dòng code sai rõ ràng; nó đến từ những giả định ngầm về thời gian. Ba thói quen giúp tôi nhiều nhất là: luôn hỏi "thông tin này có được lúc nào?", dùng chung một hàm cho train và predict, và viết test cố tình làm hỏng dữ liệu tương lai.
+### Quyền IAM cho việc đọc theo phiên bản
 
-## Tài liệu tham khảo
+Quyền `s3:GetObject` chỉ đủ để đọc bản current. Muốn đọc một phiên bản cụ thể bằng VersionId thì cần quyền `s3:GetObjectVersion`, đây là một quyền riêng, không nằm trong `s3:GetObject`. Muốn liệt kê các phiên bản thì cần thêm `s3:ListBucketVersions`. Nếu thiếu, runner sẽ gặp lỗi AccessDenied dù luồng xử lý hằng ngày vẫn chạy bình thường.
 
-- Torres, M. E. et al. (2011). [A complete ensemble empirical mode decomposition with adaptive noise](https://doi.org/10.1109/ICASSP.2011.5947265). *ICASSP*.
-- [PyEMD documentation (CEEMDAN)](https://pyemd.readthedocs.io/)
-- [pandas_market_calendars](https://github.com/rsheftel/pandas_market_calendars)
-- [Federal Reserve – FOMC meeting calendars, statements and minutes](https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm)
-- [Geopolitical Risk (GPR) Index](https://www.matteoiacoviello.com/gpr.htm)
-- [scikit-learn – Common pitfalls: data leakage](https://scikit-learn.org/stable/common_pitfalls.html)
+### Chi phí lưu trữ
+
+Mỗi phiên bản đều được tính phí lưu trữ như một object bình thường, nên bucket có Versioning sẽ lớn dần theo thời gian. Có thể đặt lifecycle rule `NoncurrentVersionExpiration` để xóa phiên bản cũ sau một số ngày, kết hợp `NewerNoncurrentVersions` để luôn giữ lại N phiên bản gần nhất. Tuy nhiên, cần bảo đảm rule không xóa mất các phiên bản đã ghim khi vẫn còn cần tái lập.
+
+## 6. Bài học về System Design
+
+S3 Versioning cho thấy "lưu được dữ liệu cũ" và "tái lập được kết quả" là hai việc khác nhau. Versioning chỉ giữ lại phiên bản; để tái lập, hệ thống cần chủ động ghi lại phiên bản nào đã được dùng.
+
+Một pipeline có thể tái lập sẽ đi theo luồng:
+
+```text
+Data Source → raw/ → clean/ → Pin (VersionId + SHA-256) → Evaluation → eval/
+```
+
+Trước mỗi lần chạy quan trọng, nên kiểm tra:
+
+- Versioning đã được bật trước những lần ghi đè hoặc xóa cần giữ lại chưa
+- Key, VersionId và SHA-256 đã được ghi vào run plan trước khi chạy chưa
+- Role của runner có quyền `s3:GetObjectVersion` chưa
+- Lifecycle rule có thể xóa phiên bản đã ghim hay không
+- Code và cấu hình (commit SHA, hash file cấu hình) đã được ghim cùng dữ liệu chưa, vì dữ liệu đúng mà code khác thì kết quả vẫn khác
+
+Một lưu ý khi triển khai hiện nay: từ ngày 5/1/2023, Amazon S3 tự động mã hóa mọi object mới bằng SSE-S3 và không thể tắt, nên khi thiết kế bucket chỉ cần chặn truy cập công khai, chỉ nhận HTTPS và quyết định có chuyển sang SSE-KMS hay không. Ngoài ra, object có từ trước khi bật Versioning vẫn ghim được với VersionId "null", nhưng những lần ghi đè xảy ra trước khi bật thì phiên bản cũ đã mất.
+
+### AWS References
+
+- [How S3 Versioning works](https://docs.aws.amazon.com/AmazonS3/latest/userguide/versioning-workflows.html)
+- [Retrieving object versions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RetrievingObjectVersions.html)
+- [Deleting object versions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html)
+- [GetObject API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html)
+- [Checking object integrity](https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html)
+- [Managing the lifecycle of objects](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html)
+- [Default encryption FAQ](https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html)

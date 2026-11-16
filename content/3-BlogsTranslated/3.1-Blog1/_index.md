@@ -1,86 +1,108 @@
 ---
 title: "Blog 1"
-date: 2026-10-24
+date: 2026-11-16
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
 ---
 
-# Don't Be Fooled by "99% Accuracy": Forecasting Return Distributions with Pinball Loss
+# A Model That Runs a Few Seconds a Day: Do You Need a SageMaker Endpoint?
 
-*Trịnh Tiến Khải · CPAWS team · Self-written from my project work*
+*Trinh Tien Khai · Posted in the AWS Study Group: [LINK TO BE ADDED AFTER POSTING]*
 
-When we started CPAWS (forecasting gold, silver, Brent and WTI prices 1–7 days ahead), the first question my team had to answer was not "which model", but **"what do we forecast and how do we measure it"**. This post shares the three most important decisions I learned from: forecast returns instead of prices, forecast quantiles instead of a single number, and always compare against a strong enough statistical baseline.
+I have been looking into ways to run machine learning inference on AWS and found something interesting: for many problems, the most important question is not "which model" but "how the model is called". This post records what I read, with an example diagram that numbers each flow so it is easy to follow.
 
-## 1. The Trap of Forecasting Price Levels
+![Nightly batch inference with AWS Lambda container images](/images/3-Blog/blog1-lambda-batch-inference.png)
 
-Suppose gold is 2,000 USD/ounce today. The laziest possible "model" says: *tomorrow's price = today's price*. Because gold rarely moves more than 1–2% a day, its mean absolute percentage error (MAPE) is only about 1%. The report would say "99% accurate" — impressive, yet the model knows nothing about the future.
+*Figure 1. Example of a nightly batch inference pipeline, drawn by me in draw.io based on AWS documentation.*
 
-Many price forecasting projects online fall into exactly this trap: the forecast line almost overlaps the actual price, but it is really just yesterday's price shifted one day to the right.
+**Scenario:** an online store wants to forecast tomorrow's number of orders for each warehouse. It runs once a night after the day's data is closed, the model runs for a few seconds, and the results are written to a database for a dashboard to read. Nobody needs the model to answer on every click.
 
-**How we handled it:** we forecast the **h-session log return**:
+The first reflex is usually "it's an ML model, so put it on a SageMaker endpoint". But after reading how it is billed, I found this choice does not fit this kind of workload.
 
-```text
-r(t, h) = ln( P(t+h) / P(t) ),  h = 1..7
+## 1. Four ways to run inference on SageMaker
+
+- **Real-time endpoint:** billed per instance-hour for as long as the endpoint is running, even with no requests. Good for low latency, steady traffic, or when you need a GPU.
+- **Serverless Inference:** scales to zero when idle, at the cost of cold starts. Memory from 1 GB to 6 GB and no GPU.
+- **Asynchronous Inference:** requests are queued; good for large payloads or long processing times.
+- **Batch Transform:** runs in batch over a whole dataset, then shuts down.
+
+For a job that runs a few seconds a day, a real-time endpoint is mostly paying for a machine that sits idle. Batch Transform or Serverless Inference would work, but if the model is small and runs on CPU there is a simpler option: AWS Lambda.
+
+## 2. Why a Lambda container image, not a zip package
+
+- A Lambda zip package is limited to 250 MB unzipped (including layers). Data libraries such as pandas, pyarrow and scikit-learn easily hit that ceiling together.
+- A container image can be up to 10 GB (uncompressed, including all layers).
+- The maximum timeout is still 15 minutes. Moving to a container does not change this limit.
+
+What I like most: the same image runs on a local machine for testing before it is pushed to Amazon ECR, so "it runs on my machine" and "it runs on Lambda" are the same thing.
+
+## 3. Following the 7 flows in the diagram
+
+1. Build the image, pin the base image by digest, tag it with the commit SHA and push it to Amazon ECR.
+2. EventBridge Scheduler runs on a nightly cron schedule and invokes the prepare Lambda asynchronously.
+3. The prepare Lambda collects and cleans the data and writes it to S3 by date (`data/dt=…/`).
+4. When prepare finishes, a Lambda destination invokes the inference Lambda. Both OnSuccess and OnFailure can be wired: if one data source fails, inference still runs for the data that is fine.
+5. The inference Lambda reads the data and the model weights in `models/`.
+6. The results are written to DynamoDB for the dashboard or API to read.
+7. Logs and metrics go to CloudWatch: one summary log line per run and an alarm on the Errors metric are enough to know the next morning how last night's run went.
+
+The red box at the bottom of the diagram is the 24/7 real-time endpoint option, which does not fit this workload.
+
+## 4. What I found while reading the documentation
+
+**A small model does not need to bring the whole framework to Lambda.** For linear models or small networks, you can train elsewhere, export the weights to a file (for example `.npz`), and at prediction time only NumPy is needed for the matrix multiplications. The image is much smaller and starts faster.
+
+**A non-AWS base image needs the runtime interface client installed.** The AWS base images (`public.ecr.aws/lambda/python`) already include it. If you use another image such as `python:3.12-slim`, you must install `awslambdaric`; without it Lambda cannot call the handler.
+
+```dockerfile
+# Simplified illustration
+FROM python:3.12-slim@sha256:<digest>
+WORKDIR /function
+COPY requirements.txt .
+RUN pip install --no-cache-dir awslambdaric -r requirements.txt
+COPY src/ ./src/
+ENTRYPOINT ["python", "-m", "awslambdaric"]
+CMD ["src.inference.handler"]
 ```
 
-With this target, the "no change" model corresponds to predicting a return of 0, and every other model has to prove it learned real changes. For display we simply convert back: `forecast price = current price × exp(r)`.
+One more detail I found while testing: `awslambdaric` looks for the handler module relative to the container's working directory. If the working directory is not where `src/` lives, Lambda reports `Runtime.ImportModuleError`. So it is better to declare `WORKDIR` explicitly instead of relying on the base image default.
 
-A small but important detail: *h sessions* follow each asset's **trading calendar** (NYSE for the GLD/SLV funds, CME for oil), not calendar days. If a valid price is missing at t or t + h, or the price is ≤ 0 (like WTI on 20/4/2020), the return is NaN instead of being filled in.
+**Asynchronous invocations are retried by Lambda.** By default Lambda retries twice when the function returns an error. The retry count can be set from 0 to 2, and the maximum event age from 60 seconds to 6 hours. For an inference job, setting retries to 0 is usually more sensible: on error it stops, the alarm fires, and the operator reads the logs and reruns it in a controlled way.
 
-## 2. One Number Is Not Enough: Forecasting Quantiles
+**Destinations only apply to asynchronous invocations.** For direct function invocations, Lambda destinations only apply to the asynchronous type (event source mappings for Kinesis, DynamoDB Streams and Kafka have their own OnFailure destination). The destination can be another Lambda, SQS, SNS, EventBridge, or S3 (S3 only for OnFailure). An easy trap: `aws lambda invoke` is synchronous (`RequestResponse`) by default, so when run by hand the first function finishes but the destination never fires. To rerun the whole chain you must call:
 
-Commodity markets are highly uncertain. Saying "gold will rise 0.3% next week" means almost nothing without "but it may range from −2% to +2.6%". So CPAWS forecasts **7 quantiles** of the return: 5%, 10%, 25%, 50%, 75%, 90%, 95%.
-
-From these, the web shows:
-- **q50**: the central scenario
-- **q10 – q90**: the price range the model believes has about an 80% chance of containing the actual price
-- **Probability of an increase**: linear interpolation of the distribution at return = 0, clamped to [5%, 95%] so we never claim absolute certainty
-
-A common technical issue: ML models can output "crossing" quantiles (q10 above q50). We fix this with a `normalize_quantiles()` function that sorts the quantiles **exactly once**, right after the model outputs, inside the predict Lambda.
-
-## 3. Scoring Quantiles with Pinball Loss
-
-MAE or RMSE cannot score a quantile forecast. The right tool is **pinball loss** (quantile loss). For quantile τ, forecast q and actual value y:
-
-```text
-L_τ(y, q) = τ · (y − q)        if y ≥ q
-          = (1 − τ) · (q − y)  if y < q
+```bash
+aws lambda invoke --function-name <prepare> --invocation-type Event out.json
 ```
 
-Intuitively, for τ = 0.9, an actual value above q90 is penalized heavily (factor 0.9), while one below q90 is penalized lightly (factor 0.1). The optimal q90 is therefore the level exceeded about 10% of the time. Pinball loss is a *proper scoring rule*: a model scores best only when it reports what it truly believes.
+## 5. Cost
 
-Alongside pinball loss we track calibration metrics:
-- **coverage_80**: share of actual values inside q10–q90, ideally close to 80%
-- **width_80**: interval width; an infinitely wide interval has 100% coverage but is useless
-- **Brier skill** for the probability of an increase
+Lambda has a free tier of 1 million requests and 400,000 GB-seconds per month that does not expire after 12 months like many other services (shared across the account). For example, a 1 GB function that always runs the full 120 seconds once a night uses only about 3,600 GB-seconds a month, less than 1% of the free tier. ECR charges for image storage by size, so set a lifecycle policy to keep only the last few images.
 
-## 4. Always Compare Against a Strong Baseline
+## Which option when
 
-The "return = 0" baseline is too weak for quantile forecasting because it says nothing about volatility. Our baseline is the **empirical quantiles of the last 252 returns** (about one trading year), computed causally: at time t we only use returns that ended before t.
+| Workload | Option |
+|---|---|
+| Infrequent batch runs, small model, CPU only, under 15 minutes | Lambda container image |
+| Irregular traffic, cold starts acceptable, no GPU needed | SageMaker Serverless Inference |
+| Large payloads or long processing | SageMaker Asynchronous Inference |
+| Scoring a large dataset in batch | SageMaker Batch Transform |
+| Constant millisecond latency, large model or GPU needed | SageMaker real-time endpoint |
 
-The primary metric is:
+## Conclusion
 
-```text
-pinball_skill = 1 − loss_model / loss_baseline_252
-```
+Choose a service by how the workload actually runs, not by the label "this is an ML problem". For a forecasting job that runs a few seconds each night, a Lambda container image has enough room for the libraries, runs exactly the same locally and costs almost nothing. The rest is understanding the invocation type (synchronous or asynchronous), because many Lambda features such as destinations and retries only apply to one type.
 
-`pinball_skill > 0` means the model beats the baseline. The team set a stricter rule: an ML model may replace the baseline only when the **lower bound of the 95% confidence interval** of pinball skill is above 0, and model comparisons also use the Diebold–Mariano test.
+*Note: service prices and limits may change, so check the AWS Pricing pages and the latest documentation before applying this. The Dockerfile is a simplified illustration.*
 
-## 5. Real Results and Lessons
+### References
 
-On the 2019 validation set, DLinear (our first ML model, price-only with a 60-session window) **lost to the 252-session baseline in all 28/28 groups** (4 assets × 7 horizons). Disappointing, but very valuable. Had we measured MAPE on prices, DLinear would still have looked "99% accurate" and might have shipped.
+- [Lambda quotas](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)
+- [Create a Lambda function using a container image](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
+- [Lambda asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html)
+- [AWS Lambda pricing](https://aws.amazon.com/lambda/pricing/)
+- [SageMaker Serverless Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html)
+- [Inference options in Amazon SageMaker AI](https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html)
 
-So the product currently uses the 252-session statistical baseline, clearly labeled "252-session statistical baseline" on the web and in chatbot answers; DLinear remains the challenger.
-
-**Three things I take away from the project:**
-1. Choosing the target and the evaluation metric matters more than choosing the model.
-2. A simple, honestly evaluated baseline is more trustworthy than a complex model that cannot prove its value.
-3. Showing uncertainty (forecast ranges) is a way of respecting users.
-
-## References
-
-- Gneiting, T. & Raftery, A. (2007). [Strictly Proper Scoring Rules, Prediction, and Estimation](https://doi.org/10.1198/016214506000001437). *JASA*.
-- Hyndman, R. & Athanasopoulos, G. [Forecasting: Principles and Practice (3rd ed.)](https://otexts.com/fpp3/)
-- Zeng, A. et al. (2022). [Are Transformers Effective for Time Series Forecasting? (DLinear)](https://arxiv.org/abs/2205.13504)
-- Harvey, D., Leybourne, S. & Newbold, P. (1997). [Testing the equality of prediction mean squared errors](https://doi.org/10.1016/S0169-2070%2896%2900719-4). *IJF*.
+`#AWS #AWSLambda #AmazonECR #AmazonSageMaker #Serverless #MLOps #AWSStudyGroup #FCAJ`
