@@ -5,47 +5,69 @@ weight: 1
 chapter: false
 pre: " <b> 5.1. </b> "
 ---
-#### About CPAWS
+#### The problem
 
-Gold, silver and crude oil prices swing sharply around major events, but ordinary users struggle to know where prices are heading and why. CPAWS forecasts the **distribution of h-session log returns** (h = 1–7) as 7 quantiles, converts them into price ranges and a probability of an increase, and lets a chatbot explain them in Vietnamese with citations.
+Gold, silver and crude oil prices move sharply around major events. Ordinary users face three difficulties:
 
-#### The Real Problem
+- **Hard to know the likely range of upcoming prices:** commentary in the press is usually qualitative, with no numbers and no published track record.
+- **Hard to understand why prices move:** news is plentiful and scattered.
+- **Hard to relate to Vietnamese dong:** world prices are quoted in USD per ounce or USD per barrel.
 
-- **Hard to know what comes next:** press forecasts are usually qualitative, with no numbers and no track record
-- **Hard to understand why prices move:** news is plentiful, scattered and not tied to concrete numbers
-- **Hard to relate to domestic prices:** world prices are quoted in USD/ounce or USD/barrel, hard to picture in VND
+#### The solution
 
-#### The Solution
+CPAWS does not forecast a single price. It forecasts the **distribution of the h-session log return** (h = 1–7) as 7 quantiles (0.05 to 0.95), then converts it into:
 
-- Forecast price ranges and the probability of an increase for the next 1–7 sessions, in USD/VND
-- A Vietnamese chatbot explains forecasts, taking every number from the system and citing every reason
-- The system runs automatically every trading day for about 15 USD/month
+- an **80% range** (10th to 90th percentile) and the median, shown in USD and VND;
+- the **probability of a rise** at each horizon;
+- **reliability measured on live data** (`rolling_8w`): how often the realized price fell inside the 80% range over the last 8 weeks.
 
-#### Architecture Overview
+A Vietnamese chatbot answers questions about these forecasts. Every number is read from the database by a tool, every news item is cited, and the chatbot gives no investment advice.
 
-1. **Ingestion:** EventBridge Scheduler triggers the ingest Lambda every trading day, writing data to S3 (`raw/`, `clean/`)
-2. **Prediction:** when ingestion finishes, Lambda Destinations invoke the predict Lambda (container image, NumPy inference), which writes results to DynamoDB
-3. **API:** API Gateway + Cognito authorizer serve forecasts to the web
-4. **Chatbot:** a Lambda calls the Amazon Bedrock Converse API and gets numbers through the `get_forecast` tool
-5. **Operations:** CloudWatch Alarms, AWS Budgets, infrastructure written in AWS CDK
+The model currently published (`baseline-q252`) is a **252-session statistical baseline**: the empirical quantiles of returns over roughly the last trading year. The team tried machine learning models (DLinear, CEEMDAN, volatility-scaled models), but none beat this baseline with enough confidence under the criterion fixed in advance (section [5.3.2](../5.3-data-and-model/5.3.2-baseline-forecast/)). The web app and the chatbot therefore always label the source as "252-session statistical baseline".
 
-![overview](/images/5-Workshop/CPAWS-architecture.jpg)
+#### Current architecture
 
-#### CDK Stacks
+![CPAWS current architecture](/images/5-Workshop/CPAWS-architecture-current.png)
+
+*Diagram drawn by the CPAWS team in draw.io, state as of 13/11/2026. Every component on the diagram is deployed and running.*
+
+The system has three flows:
+
+1. **Daily ingest and forecast** (19:15 Vietnam time, Tuesday–Saturday). EventBridge Scheduler invokes the `ingest` Lambda, which downloads prices and writes a snapshot to S3. When ingest finishes, whether it succeeds or fails, Lambda Destinations invokes the `predict` Lambda. Predict computes the forecast for each asset and writes it to DynamoDB `cpaws-dev-forecasts`. Each published record is written exactly once and never overwritten.
+2. **Reliability measurement** (20:45 Vietnam time). The `accuracy-job` Lambda compares past forecasts with the realized prices now known, then writes the results to table `cpaws-dev-accuracy`.
+3. **User-facing services.** A React web app on Amplify Hosting signs in with Cognito and calls the REST API (API Gateway + Cognito authorizer) to get forecasts (`/forecasts`), reliability (`/accuracy`) and to ask the chatbot (`/chat`). The chat Lambda calls Claude Haiku 4.5 on Bedrock with two tools, `get_forecast` and `get_news`.
+
+Operations run alongside these flows:
+- CloudWatch Logs, metric filters and 6 alarms that send email through Amazon SNS;
+- the EIA API key stored in SSM Parameter Store;
+- AWS Budgets to track cost;
+- infrastructure written in CDK, split into 5 stacks.
+
+#### CDK stacks
 
 | Stack | Main resources |
 |---|---|
-| `CpawsData` | S3 data lake, ECR (ingest, predict), ingest Lambda, predict Lambda |
-| `CpawsServing` | DynamoDB `Forecasts` (PK `asset`, SK `base_date`) |
-| `CpawsOps` | EventBridge Scheduler, CloudWatch Alarms |
-| `CpawsAuth` | Cognito User Pool (no self sign-up) |
-| `CpawsApi` | REST API + Cognito authorizer, API Lambda, chat Lambda |
+| `CpawsData` | S3 `cpaws-dev-lake`, ECR `cpaws-dev-ingest` and `cpaws-dev-predict`, Lambda `ingest`, `predict`, `accuracy-job`, two EventBridge Scheduler schedules |
+| `CpawsServing` | DynamoDB `forecasts`, `news-labels`, `chat-usage`, `accuracy` (on-demand) |
+| `CpawsAuth` | Cognito User Pool, self sign-up disabled |
+| `CpawsApi` | REST API stage `dev`; Lambda `forecasts-api`, `accuracy-api`, `chat-api` |
+| `CpawsOps` | SNS alarm topic, 6 CloudWatch alarms |
 
-#### Cost Estimate
+Amplify Hosting, the SSM parameter holding the API key and AWS Budgets are created outside CDK (see [5.4](../5.4-infrastructure/)).
 
-With one run per trading day, Lambda, Scheduler, S3 and DynamoDB cost only a few USD per month. The largest cost is Amazon Bedrock when the chatbot is heavily used, which is why the API requires sign-in and rate limiting.
+#### Compared with the proposal
 
-#### Product Demo
+During the project the architecture was simplified relative to the [proposal](../../2-proposal/). Each change has an ADR in the repository.
 
-- Demo video: ...
-- Production link: ...
+| Proposal | Current state | Reason |
+|---|---|---|
+| Step Functions and SageMaker AI for weekly retraining | Two Lambdas chained by a destination, no retraining | The 252-session baseline needs no model artifact; ML models did not beat it (ADR-0011, ADR-0012) |
+| Secrets Manager | SSM Parameter Store `SecureString` | Only one key, no automatic rotation needed; cost close to zero |
+| News labelling with Bedrock (Nova 2 Lite) | 2–3 Fed/EIA releases labelled by hand each week | The check on 49 real releases missed its thresholds (ADR-0013) |
+| Router choosing between Nova and Haiku | Every question goes to Claude Haiku 4.5 | The router missed its threshold on a held-out question set (section [5.5](../5.5-chatbot/)) |
+| Bedrock Guardrails, Knowledge Bases | Not enabled | Controlled with prompt rules, tools and server-side checks (decision of 11/11/2026) |
+
+#### Product demo
+
+- Demo video: [LINK TO BE ADDED]
+- Production (Amplify Hosting): [LINK TO BE ADDED]. The site requires sign-in; a trial account for graders is sent with the submission and is not written on this page.
