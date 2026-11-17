@@ -11,6 +11,7 @@ pre: " <b> 1.10. </b> "
 - Làm chủ kiến trúc Serverless toàn diện: Từ xử lý sự kiện (S3 triggers), lưu trữ (DynamoDB) đến xây dựng API (API Gateway).
 - Xây dựng quy trình CI/CD tự động cho ứng dụng Serverless bằng AWS CodePipeline.
 - Thực hành giám sát (Monitoring) và truy vết (Tracing) ứng dụng Serverless chuyên sâu với CloudWatch và X-Ray.
+- Đánh giá kết quả mô hình S1a, tạo tài khoản cho người chấm và mở tính năng mở đăng ký Cognito
 
 ### CÁC ĐẦU VIỆC CỦA WEEK 10:
 
@@ -27,4 +28,4 @@ pre: " <b> 1.10. </b> "
 2. Xây dựng hoàn chỉnh luồng xử lý Serverless Backend: Tự động hóa xử lý ảnh với S3 Trigger và quản lý dữ liệu NoSQL với DynamoDB.
 3. Triển khai thành công Full-stack Serverless App: Kết nối Frontend với Backend thông qua API Gateway và Lambda, xử lý tốt vấn đề CORS.
 4. Thiết lập quy trình DevOps tự động (CI/CD) cho ứng dụng Serverless, giúp việc deploy Code và Frontend trở nên nhanh chóng và ít lỗi.
-5. Theo dõi và duyệt lượt chạy official test2020 của dự án CPAWS (16/11): S1a cải thiện có ý nghĩa thống kê ở bạc, WTI, Brent; champion giữ `baseline-q252` theo kế hoạch đã khóa.
+5. Theo dõi và duyệt lượt chạy official test2020 của dự án CPAWS (16/11): S1a cải thiện có ý nghĩa thống kê ở bạc, WTI, Brent; champion giữ `baseline-q252` theo kế hoạch đã khóa. Đã tạo tài khoản cho người chấm và hoàn thành tạo tính năng tự đăng ký Cognito
