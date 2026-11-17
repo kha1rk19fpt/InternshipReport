@@ -7,7 +7,6 @@ pre: " <b> 1.10. </b> "
 ---
 
 ### MỤC TIÊU TRONG WEEK 10:
-- Xây dựng đặc trưng tín hiệu (CEEMDAN, tin tức Fed/EIA, GPR, OVX/GVZ) không rò rỉ dữ liệu tương lai cho mô hình CPAWS.
 - Làm chủ kiến trúc Serverless toàn diện: Từ xử lý sự kiện (S3 triggers), lưu trữ (DynamoDB) đến xây dựng API (API Gateway).
 - Xây dựng quy trình CI/CD tự động cho ứng dụng Serverless bằng AWS CodePipeline.
 - Thực hành giám sát (Monitoring) và truy vết (Tracing) ứng dụng Serverless chuyên sâu với CloudWatch và X-Ray.
@@ -24,8 +23,7 @@ pre: " <b> 1.10. </b> "
 | **6** | **- Thực hành Lab 25: Serverless - Giám sát ứng dụng Serverless với CloudWatch và X-Ray**<br>+ Chuẩn bị<br>+ Giám sát với CloudWatch<br>* Gỡ lỗi với nhật ký CloudWatch<br>* Tạo số liệu tùy chỉnh<br>* Tạo cảnh báo với CloudWatch Alarm<br>+ Theo dõi với X-ray<br>+ Dọn dẹp | 20/11/2026 | 20/11/2026 | [Lab 25 Intro](https://000085.awsfcaj.com/vi/1-preparation/)<br>[CloudWatch](https://000085.awsfcaj.com/vi/2-cloudwatch-monitor/)<br>[X-Ray](https://000085.awsfcaj.com/vi/3-x-ray-trace/) |
 
 ### THÀNH TỰU ĐẠT ĐƯỢC TRONG WEEK 10:
-1. Hoàn thành hàm tạo đặc trưng dùng chung cho train và predict, có test chống rò rỉ dữ liệu tương lai.
-2. Xây dựng hoàn chỉnh luồng xử lý Serverless Backend: Tự động hóa xử lý ảnh với S3 Trigger và quản lý dữ liệu NoSQL với DynamoDB.
-3. Triển khai thành công Full-stack Serverless App: Kết nối Frontend với Backend thông qua API Gateway và Lambda, xử lý tốt vấn đề CORS.
-4. Thiết lập quy trình DevOps tự động (CI/CD) cho ứng dụng Serverless, giúp việc deploy Code và Frontend trở nên nhanh chóng và ít lỗi.
-5. Theo dõi và duyệt lượt chạy official test2020 của dự án CPAWS (16/11): S1a cải thiện có ý nghĩa thống kê ở bạc, WTI, Brent; champion giữ `baseline-q252` theo kế hoạch đã khóa. Đã tạo tài khoản cho người chấm và hoàn thành tạo tính năng tự đăng ký Cognito
+1. Xây dựng hoàn chỉnh luồng xử lý Serverless Backend: Tự động hóa xử lý ảnh với S3 Trigger và quản lý dữ liệu NoSQL với DynamoDB.
+2. Triển khai thành công Full-stack Serverless App: Kết nối Frontend với Backend thông qua API Gateway và Lambda, xử lý tốt vấn đề CORS.
+3. Thiết lập quy trình DevOps tự động (CI/CD) cho ứng dụng Serverless, giúp việc deploy Code và Frontend trở nên nhanh chóng và ít lỗi.
+4. Theo dõi và duyệt lượt chạy official test2020 của dự án CPAWS (16/11): S1a cải thiện có ý nghĩa thống kê ở bạc, WTI, Brent; champion giữ `baseline-q252` theo kế hoạch đã khóa.
