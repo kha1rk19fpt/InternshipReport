@@ -19,9 +19,11 @@ chapter: false
 
 &emsp; **Ngành:** Trí Tuệ Nhân Tạo
 
+&emsp; **Lớp:** ...
+
 &emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Vietnam
 
-&emsp; **Vị trí thực tập:** FCAJ Cloud Intern
+&emsp; **Vị trí thực tập:** Workforce Bootcamp - First Cloud AI Journey
 
 &emsp; **Thời gian thực tập:** Từ ngày 14/09/2026 đến ngày 14/12/2026
 
@@ -31,7 +33,7 @@ chapter: false
 
 1.  [Worklog](1-worklog/)
 2.  [Proposal](2-proposal/)
-3.  [Blog kỹ thuật](3-blogstranslated/)
+3.  [Các bài blogs đã đăng](3-blogsposted/)
 4.  [Các events đã tham gia](4-eventparticipated/)
 5.  [Workshop](5-workshop/)
 6.  [Tự đánh giá](6-self-evaluation/)

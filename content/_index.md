@@ -13,19 +13,21 @@ chapter: false
 
 &emsp; **Full Name:** Trinh Tien Khai
 
-&emsp; **Phone Number:** ...
+&emsp; **Phone Number:** 0943580877
 
-&emsp; **Email:** ...
+&emsp; **Email:** khaitrinh2005@gmail.com
 
-&emsp; **University:** ...
+&emsp; **University:** FPT University Ho Chi Minh City
 
-&emsp; **Major:** ...
+&emsp; **Major:** Artificial Intelligence
+
+&emsp; **Class:** ...
 
 &emsp; **Internship Company:** Amazon Web Services Vietnam Co., Ltd.
 
-&emsp; **Internship Position:** FCAJ Cloud Intern
+&emsp; **Internship Position:** Workforce Bootcamp - First Cloud AI Journey
 
-&emsp; **Internship Duration:** From 07/09/2026 to ...
+&emsp; **Internship Duration:** From 14/09/2026 to 14/12/2026
 
 ![Your profile picture](/images/avatar.jpg)
 
@@ -33,7 +35,7 @@ chapter: false
 
 1.  [Worklog](1-worklog/)
 2.  [Proposal](2-proposal/)
-3.  [Technical Blogs](3-blogstranslated/)
+3.  [Blogs Posted](3-blogsposted/)
 4.  [Events Participated](4-eventparticipated/)
 5.  [Workshop](5-workshop/)
 6.  [Self-evaluation](6-self-evaluation/)
