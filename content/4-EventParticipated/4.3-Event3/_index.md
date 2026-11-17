@@ -1,58 +1,69 @@
 ---
 title: "Event 3"
-date: 2026-10-26
+date: 2026-10-02
 weight: 3
 chapter: false
 pre: " <b> 4.3. </b> "
 ---
 
-# Summary Report: "STEM Plush Toys with AWS HCM"
+# Summary Report: "Fireside Chat with Dr. Werner"
 
 ### Event Overview
 
-- **Event Name:** STEM plush toys with AWS HCM  
-- **Date:** October 26, 2026  
-- **Role:** Volunteer  
-- **Format:** Volunteering activity  
-- **Location:** Floor 36, Ho Chi Minh City  
+- **Event Name:** Fireside Chat with Dr. Werner (AWS CTO), with the AWS FCAJ HCM community  
+- **Date:** October 2, 2026  
+- **Role:** Attendee  
+- **Format:** In-person talk and conversation  
+- **Location:** Floor 26, Bitexco Financial Tower, District 1, Ho Chi Minh City  
 
-This was a volunteering activity organized by AWS HCM, inviting employees, interns and community members to make plush toys as gifts for children. Each toy was packed with a STEM learning card containing simple science facts and puzzles, to spark children's curiosity about science, technology, engineering and mathematics. Unlike the two professional events, here I worked hands-on with everyone.
+The session was organized by the AWS FCAJ HCM community and announced on the program's channels. It was a rare chance for interns to hear a senior AWS technology leader speak first-hand about how Amazon builds systems, its engineering culture, and what young engineers should prepare for in the AI era. The room was full, with interns, mentors and community members attending.
 
-### Activities
+### Key Topics
 
-#### Opening
-- The organizers introduced the purpose: bringing joy and STEM inspiration to children in difficult circumstances
-- Instructions on how to make the plush toys and safety notes for needles and scissors
+#### Amazon's Builder Culture
+- Everything starts from the customer: write down the problem and the benefit for users before choosing technology
+- Small teams fully own their services: "you build it, you run it"
+- Experiment boldly, but measure results and fix mistakes quickly
 
-#### Making the Plush Toys
-- Volunteers split into small groups, each receiving a kit of toy shells, stuffing and thread
-- Stuffing each toy evenly so it is soft, then sewing it closed and checking the seams
-- Finishing details, attaching labels and checking quality before packing
+#### Designing Simple, Resilient Systems
+- Complex systems that work usually evolve from simple systems that worked; avoid designing for complexity from day one
+- Design for failure: any component can break, so decouple parts so one failure does not bring the whole system down
+- Observability is part of the design, not an afterthought
 
-#### Packing with STEM Cards
-- Each plush toy was packed with a STEM learning card
-- Writing encouraging notes for the children
-- Collecting and sorting the finished toys for the organizers to deliver
+#### Cost as an Architectural Requirement
+- Cost should be considered at design time, just like security or performance
+- Resources running all the time without serving anyone are waste; prefer on-demand or scheduled architectures
+- Measure cost per unit of value (for example cost per forecast) to know whether a system is sustainable
 
-### What I Learned
+#### AI and the Software Engineering Profession
+- AI makes engineers faster, but engineers remain responsible for correctness, security and quality
+- Core skills matter more than ever: understanding the problem, asking the right questions, verifying results
+- Advice for students: build strong fundamentals, stay curious, build real products rather than only studying theory
 
-#### Community Spirit
-- Technology is not only about products and services; tech companies can also help pass on a love of science to the next generation
-- A small gift with a STEM card can be the start of a child's curiosity
+### Key Takeaways
 
-#### Teamwork
-- Working with people I had just met and splitting work by step (stuffing, sewing, checking, packing) made the group faster and more consistent
-- Checking each toy before packing reminded me of code review in our project: finishing is not enough, it has to be done right
+- **Start from users:** a product is more useful when it answers what users really need
+- **Simple first, optimize later:** pick a good-enough solution you can measure, then improve
+- **Design for failure and for cost:** both belong in the very first design
+- **A builder's responsibility:** use AI to speed up, but always verify
 
-#### Balance
-- After weeks focused on Labs and the project, this activity helped me relax and recharge
+### Personal Learnings
+
+#### A Change in Mindset
+- Before this talk, I thought an AI project should use the most complex model possible. Afterwards, I understood that a simple model evaluated honestly is worth more than a complex model that cannot prove its value
+- I learned to see cost as a design criterion rather than a number checked after the system is built
+
+#### Application to the CPAWS Project
+- The team chose a scheduled batch-prediction architecture (EventBridge Scheduler → Lambda) with no 24/7 endpoints, keeping costs within the credit budget
+- A machine learning model replaces the running model only when it is proven better than the statistical baseline — the "measure results" principle
+- Components (ingestion, prediction, chatbot) are decoupled so one failing data source does not stop the whole system
 
 ### Event Experience
 
-This was my first time making a plush toy by hand. I was clumsy with the stitches at first, but with help from the staff and my group I got used to it and finished my toys. Seeing the boxes of gifts packed, knowing they would reach the children, was a memorable feeling.
+The session had a friendly, close atmosphere. I listened, took notes and followed the exchange between the speaker and the audience. What impressed me most was how the speaker described very simple principles applied consistently at enormous scale, showing that good engineering is about discipline, not complexity.
 
-The activity took place on Monday morning, before the CPAWS team meeting that same day. I went back to project work relaxed and more motivated, understanding that what we make — software or a plush toy — matters when it is made for others.
+The talk came right when the CPAWS team was about to finalize its architecture, so I brought many of these ideas into our discussions the following week.
 
 ### Event Photos
 
-...
+![Fireside Chat with Dr. Werner](/images/4-Event/CTO.jpg)

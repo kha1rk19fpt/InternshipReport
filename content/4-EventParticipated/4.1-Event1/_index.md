@@ -1,76 +1,45 @@
 ---
 title: "Event 1"
-date: 2026-09-29
+date: 2026-09-26
 weight: 1
 chapter: false
 pre: " <b> 4.1. </b> "
 ---
 
-# Summary Report: "AWS Cloud & AI Day 2026"
+# Summary Report: "Buildrathon Kickoff: Code the Future with CMC Global"
 
 ### Event Overview
 
-- **Event Name:** AWS Cloud & AI Day 2026 (Ho Chi Minh City venue)  
-- **Date:** September 29, 2026  
+- **Event Name:** Buildrathon Kickoff: Code the Future with CMC Global  
+- **Date:** September 26, 2026  
 - **Role:** Attendee  
-- **Format:** Full-day conference, keynote and breakout sessions  
-- **Location:** Floor 26, Bitexco Financial Tower, District 1, Ho Chi Minh City  
-- **Agenda:** [Event agenda](https://aws.amazon.com/events/cloud-day-hanoi/agenda/)
+- **Format:** Half-day kickoff: introduction, talkshow, Q&A and a short hands-on challenge  
+- **Location:** Bitexco Financial Tower, District 1, Ho Chi Minh City  
+- **Agenda:** [Event page](https://luma.com/8fe9vvps)
 
-AWS Cloud & AI Day is AWS's annual event in Vietnam, bringing together AWS experts, partners and customers to share the latest in cloud and AI. In 2026 the headline topic was agentic AI: how to take AI agents from demo to real operation, and the data foundation needed for AI to be reliable. Together with other FCAJ interns, I followed the event at floor 26 of the AWS office in Ho Chi Minh City.
+This was the kickoff session of the Buildathon organized with CMC Global. It introduced the Buildathon challenge and its judging criteria, and gave participants an overview of AWS Cloud, generative AI and how AI agents are built with AWS services. It was the first AWS event I attended during my internship.
 
-### Program Highlights
+### Program
 
-#### Opening Keynote
-The keynote centered on one question: what does it take to solve problems everyone says are impossible? My key notes:
-- Innovation starts from customer problems, not from technology
-- Generative AI and agentic AI are moving from experimentation to real business value
-- Global infrastructure and managed services let small teams build big products
-- Vietnamese companies are accelerating their digital transformation on AWS
+- **Buildathon kickoff:** goals of the challenge, judging criteria, and an overview of AWS Cloud, generative AI and AI agents on AWS
+- **Ice-breaking:** participants introduced themselves and met possible teammates
+- **Talkshow "Building a Career in Cloud & AI":** speakers shared cloud and AI trends, real projects and career paths, followed by a Q&A session
+- **Hands-on: AI Agent Challenge:** a short challenge around prompt engineering, retrieval-augmented generation (RAG), knowledge bases and AI agents, with mentor support
+- **Closing and mock interviews:** wrap-up and group photo, then optional mock interviews for Cloud, DevOps, Data and Solutions Architect roles
 
-#### Agentic AI: From Demo to Deployment
-- **The demo-to-production gap:** an agent that works in a demo may not be reliable on real data; it needs testing, monitoring and limited permissions
-- **Agents for software development:** AI can write code, tests, reviews and documentation, but humans remain accountable for quality
-- **Migration at scale with AI:** how AWS Transform uses agents to help modernize and migrate legacy applications
+### My Participation
 
-#### AI-Ready Data Foundations
-- Scattered, non-standardized data is the biggest barrier when bringing AI into products
-- A data lake on Amazon S3 as the foundation, combined with data governance (catalog, access control, data quality)
-- A model is only as good as its input data: data lineage and processing must be traceable
+- I attended the kickoff, the talkshow and the Q&A session
+- In the hands-on part, I answered the shared quiz together with the room
+- I did not join the mock interviews and did not register a team for the Buildathon
 
-#### Application Modernization and Platform Engineering
-- A Vietnamese bank's story of building an Internal Developer Platform on Amazon EKS
-- Choosing the right tool for the job: complex architectures are not always needed; a simpler solution can be more effective and cheaper
-- An introduction to Amazon Quick with an AI-assistant building challenge for attendees
+### Takeaways
 
-### Key Technical Takeaways
-
-- **Agents need guardrails:** least-privilege IAM, a limited tool scope, and logging every action for review
-- **Evaluate before trusting:** a fixed test question set is needed to measure agent quality, not just a few manual tries
-- **Layered data lake:** separate raw, cleaned and feature data, each layer with clear rules
-- **Serverless and managed services:** let small teams focus on the product instead of running servers
-
-### Personal Learnings
-
-#### Technical Growth
-- I understood better that the hard part of real-world AI lies in data, testing and operations, not just the model
-- The part on evaluating agents with a fixed question set helped me picture how our team could test the project chatbot
-
-#### Industry Insights
-- Vietnamese companies, especially in banking and finance, are investing heavily in data platforms and AI
-- Demand is growing for engineers who understand data, models and cloud together
-
-#### Application to the CPAWS Project
-- Designing the S3 data lake with `raw/`, `clean/`, `features/`, `models/`, `eval/` layers so every number in the report is traceable
-- The chatbot takes numbers only from tools and never makes up figures — the "agent with guardrails" idea repeated throughout the event
-- Preparing a fixed test question set for the chatbot and running the official scoring only once
-
-### Event Experience
-
-This was the first big AWS event I attended since starting my internship. The atmosphere was lively, and hearing real stories first-hand showed me how valuable the Lab skills are once applied in companies. I mostly listened, took notes and followed the presentations; many of those notes later went into our team discussions when designing the CPAWS architecture.
-
-The event also made me more confident in our direction: a useful AI product does not need the most complex model, but trustworthy data, honest evaluation and a stable system.
+- The hands-on topics (prompt engineering, RAG, knowledge bases, agents) gave me a first map of the building blocks of a generative AI application on AWS
+- A few days later, the CPAWS team finalized its topic and added a Vietnamese chatbot on Amazon Bedrock. Our chatbot uses the simplest form of these ideas: the model gets numbers only through tools (`get_forecast`, `get_news`), and the MVP does not use knowledge bases or RAG
 
 ### Event Photos
 
-...
+![Buildrathon Kickoff: Code the Future with CMC Global](/images/4-Event/buildrathon2.jpg)
+
+![At the Buildrathon Kickoff](/images/4-Event/buildrathon1.jpg)

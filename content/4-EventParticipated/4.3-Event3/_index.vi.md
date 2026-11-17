@@ -1,58 +1,69 @@
 ---
 title: "Sự Kiện 3"
-date: 2026-10-26
+date: 2026-10-02
 weight: 3
 chapter: false
 pre: " <b> 4.3. </b> "
 ---
 
-# Báo Cáo Tóm Tắt: "Thú Nhồi Bông Làm STEM Cùng AWS HCM"
+# Báo Cáo Tóm Tắt: "Fireside Chat with Dr. Werner"
 
 ### Tổng Quan Sự Kiện
 
-- **Tên Sự Kiện:** Thú nhồi bông làm STEM cùng AWS HCM  
-- **Ngày:** 26 tháng 10, 2026  
-- **Vai Trò:** Tình nguyện viên  
-- **Hình Thức:** Hoạt động thiện nguyện  
-- **Địa Điểm:** Tầng 36, TP.HCM  
+- **Tên Sự Kiện:** Fireside Chat with Dr. Werner (CTO AWS), cùng cộng đồng AWS FCAJ HCM  
+- **Ngày:** 2 tháng 10, 2026  
+- **Vai Trò:** Người tham dự  
+- **Hình Thức:** Buổi chia sẻ và trò chuyện trực tiếp  
+- **Địa Điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, Quận 1, TP.HCM  
 
-Đây là hoạt động thiện nguyện do AWS HCM tổ chức, mời nhân viên, thực tập sinh và thành viên cộng đồng cùng làm thú nhồi bông để gửi tặng các em nhỏ. Mỗi con thú được đóng gói kèm thẻ học STEM với những câu đố và kiến thức khoa học đơn giản, nhằm khơi gợi sự tò mò của các em với khoa học, công nghệ, kỹ thuật và toán học. Khác với hai sự kiện chuyên môn trước, ở hoạt động này tôi trực tiếp tham gia làm cùng mọi người.
+Buổi gặp gỡ được cộng đồng AWS FCAJ HCM tổ chức và thông báo trên các kênh của chương trình. Đây là dịp hiếm hoi để thực tập sinh được nghe trực tiếp một lãnh đạo công nghệ cấp cao của AWS chia sẻ về cách Amazon xây dựng hệ thống, văn hóa kỹ thuật và những điều người kỹ sư trẻ cần chuẩn bị trong thời đại AI. Phòng sự kiện kín chỗ, với sự tham gia của thực tập sinh, mentor và thành viên cộng đồng.
 
-### Nội Dung Hoạt Động
+### Các Chủ Đề Chính
 
-#### Mở đầu
-- Ban tổ chức giới thiệu mục đích chương trình: mang niềm vui và cảm hứng học STEM đến các em nhỏ có hoàn cảnh khó khăn
-- Hướng dẫn quy trình làm thú nhồi bông và lưu ý an toàn khi dùng kim, kéo
+#### Văn hóa "builder" của Amazon
+- Mọi thứ bắt đầu từ khách hàng: viết rõ vấn đề và lợi ích cho người dùng trước khi chọn công nghệ
+- Đội nhỏ, sở hữu trọn vẹn dịch vụ của mình: "you build it, you run it", người viết code cũng là người vận hành
+- Dám thử nghiệm nhưng phải đo lường được kết quả, sai thì sửa nhanh
 
-#### Làm thú nhồi bông
-- Chia thành các nhóm nhỏ, mỗi nhóm nhận bộ nguyên liệu gồm vỏ thú, bông và chỉ khâu
-- Nhồi bông vừa tay để thú mềm và đều, sau đó khâu kín và kiểm tra lại đường may
-- Hoàn thiện chi tiết, gắn nhãn và kiểm tra chất lượng trước khi đóng gói
+#### Thiết kế hệ thống đơn giản và bền vững
+- Hệ thống phức tạp thường được phát triển từ một hệ thống đơn giản chạy tốt, không nên thiết kế phức tạp ngay từ đầu
+- Thiết kế cho lỗi: mọi thành phần đều có thể hỏng, nên tách rời các phần để một lỗi không kéo sập toàn hệ thống
+- Khả năng quan sát (observability) là một phần của thiết kế, không phải việc làm thêm sau cùng
 
-#### Đóng gói kèm thẻ STEM
-- Mỗi thú nhồi bông được đóng gói cùng một thẻ học STEM
-- Viết lời nhắn động viên gửi các em
-- Tập hợp và phân loại thành phẩm để ban tổ chức chuyển đến nơi nhận
+#### Chi phí là một yêu cầu kiến trúc
+- Chi phí cần được cân nhắc ngay từ lúc thiết kế, giống như bảo mật hay hiệu năng
+- Tài nguyên chạy liên tục mà không phục vụ ai là lãng phí; ưu tiên kiến trúc chạy theo nhu cầu hoặc theo lịch
+- Đo chi phí theo đơn vị giá trị (ví dụ chi phí cho mỗi lượt dự đoán) để biết hệ thống có bền vững hay không
 
-### Những Điều Tôi Học Được
+#### AI và nghề kỹ sư phần mềm
+- AI giúp kỹ sư làm nhanh hơn, nhưng người kỹ sư vẫn chịu trách nhiệm về tính đúng đắn, bảo mật và chất lượng
+- Kỹ năng quan trọng hơn bao giờ hết: hiểu vấn đề, đặt câu hỏi đúng, kiểm chứng kết quả
+- Lời khuyên cho sinh viên: học nền tảng thật chắc, luôn tò mò, xây sản phẩm thật thay vì chỉ học lý thuyết
 
-#### Tinh thần cộng đồng
-- Công nghệ không chỉ nằm ở sản phẩm và dịch vụ; các công ty công nghệ còn có thể góp phần lan tỏa niềm yêu thích khoa học đến thế hệ sau
-- Một món quà nhỏ kèm thẻ học STEM có thể là khởi đầu cho sự tò mò của một em nhỏ
+### Kiến Thức Rút Ra
 
-#### Làm việc nhóm
-- Làm việc cùng những người mới gặp, chia việc theo từng công đoạn (nhồi bông, khâu, kiểm tra, đóng gói) giúp cả nhóm làm nhanh và đều tay hơn
-- Kiểm tra chất lượng từng thành phẩm trước khi đóng gói nhắc tôi về việc review công việc trong dự án: làm xong chưa đủ, phải làm đúng
+- **Bắt đầu từ người dùng:** sản phẩm có ích hơn khi trả lời đúng câu hỏi người dùng thật sự cần
+- **Đơn giản trước, tối ưu sau:** chọn giải pháp đủ tốt, có thể đo lường rồi mới cải tiến
+- **Thiết kế cho lỗi và cho chi phí:** hai yếu tố cần có ngay từ bản thiết kế đầu tiên
+- **Trách nhiệm của người builder:** dùng AI để tăng tốc nhưng luôn tự kiểm chứng
 
-#### Cân bằng
-- Sau nhiều tuần tập trung vào Lab và dự án, hoạt động này giúp tôi thư giãn và nạp lại năng lượng
+### Bài Học Cá Nhân
+
+#### Thay đổi trong cách suy nghĩ
+- Trước buổi chia sẻ, tôi nghĩ dự án AI phải dùng mô hình càng phức tạp càng tốt. Sau buổi này, tôi hiểu rằng một mô hình đơn giản nhưng được đánh giá trung thực có giá trị hơn một mô hình phức tạp không chứng minh được hiệu quả
+- Tôi học được cách nhìn chi phí như một tiêu chí thiết kế chứ không phải con số kiểm tra sau khi đã xây xong
+
+#### Ứng Dụng Cho Dự Án CPAWS
+- Nhóm chọn kiến trúc dự đoán theo lô chạy theo lịch (EventBridge Scheduler → Lambda), không dùng endpoint chạy 24/7, giữ chi phí trong ngân sách credit
+- Mô hình học máy chỉ được thay mô hình đang chạy khi chứng minh được tốt hơn mốc thống kê, đúng với tinh thần "đo lường được kết quả"
+- Tách các thành phần (thu thập, dự đoán, chatbot) để một nguồn dữ liệu lỗi không làm dừng toàn hệ thống
 
 ### Trải Nghiệm Sự Kiện
 
-Đây là lần đầu tôi tự tay làm thú nhồi bông. Lúc đầu tôi khá lóng ngóng với đường khâu, nhưng nhờ các anh chị và bạn cùng nhóm hướng dẫn, tôi dần quen và hoàn thành được những con thú của mình. Cảm giác nhìn những thùng quà được đóng gói xong, biết rằng chúng sẽ đến tay các em nhỏ, rất đáng nhớ.
+Buổi gặp gỡ diễn ra trong không khí gần gũi. Tôi ngồi lắng nghe, ghi chép và theo dõi phần trao đổi giữa diễn giả với khán giả. Điều tôi ấn tượng nhất là cách diễn giả nói về những nguyên tắc rất đơn giản nhưng được áp dụng nhất quán ở quy mô cực lớn, cho thấy kỹ thuật tốt không nằm ở sự phức tạp mà ở sự kỷ luật.
 
-Hoạt động diễn ra vào sáng thứ Hai, trước buổi họp nhóm CPAWS cùng ngày. Tôi trở lại công việc dự án với tâm trạng thoải mái và thêm động lực, vì hiểu rằng những gì mình làm, dù là một sản phẩm phần mềm hay một con thú nhồi bông, đều có ý nghĩa khi hướng đến người khác.
+Buổi chia sẻ đến đúng lúc nhóm CPAWS đang chuẩn bị chốt kiến trúc, nên nhiều ý tưởng được tôi mang về thảo luận ngay trong tuần sau đó.
 
 ### Ảnh Sự Kiện
 
-...
+![Fireside Chat with Dr. Werner](/images/4-Event/CTO.jpg)

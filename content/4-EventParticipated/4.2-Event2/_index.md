@@ -1,69 +1,76 @@
 ---
 title: "Event 2"
-date: 2026-10-02
+date: 2026-09-29
 weight: 2
 chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-# Summary Report: "Meet the AWS CTO"
+# Summary Report: "AWS Cloud and AI Day Hanoi – Watch Party: Ho Chi Minh City"
 
 ### Event Overview
 
-- **Event Name:** Meet the AWS CTO with the AWS FCAJ HCM community  
-- **Date:** October 2, 2026  
+- **Event Name:** AWS Cloud and AI Day Hanoi – Watch Party: Ho Chi Minh City  
+- **Date:** September 29, 2026  
 - **Role:** Attendee  
-- **Format:** In-person talk and conversation  
+- **Format:** Watch party: following the Hanoi event live from the Ho Chi Minh City venue  
 - **Location:** Floor 26, Bitexco Financial Tower, District 1, Ho Chi Minh City  
+- **Agenda:** [Event agenda](https://aws.amazon.com/events/cloud-day-hanoi/agenda/)
 
-The session was organized by the AWS FCAJ HCM community and announced on the program's channels. It was a rare chance for interns to hear a senior AWS technology leader speak first-hand about how Amazon builds systems, its engineering culture, and what young engineers should prepare for in the AI era. The room was full, with interns, mentors and community members attending.
+AWS Cloud & AI Day is AWS's annual event in Vietnam, bringing together AWS experts, partners and customers to share the latest in cloud and AI. In 2026 the headline topic was agentic AI: how to take AI agents from demo to real operation, and the data foundation needed for AI to be reliable. Together with other FCAJ interns, I followed the event at floor 26 of the AWS office in Ho Chi Minh City.
 
-### Key Topics
+### Program Highlights
 
-#### Amazon's Builder Culture
-- Everything starts from the customer: write down the problem and the benefit for users before choosing technology
-- Small teams fully own their services: "you build it, you run it"
-- Experiment boldly, but measure results and fix mistakes quickly
+#### Opening Keynote
+The keynote centered on one question: what does it take to solve problems everyone says are impossible? My key notes:
+- Innovation starts from customer problems, not from technology
+- Generative AI and agentic AI are moving from experimentation to real business value
+- Global infrastructure and managed services let small teams build big products
+- Vietnamese companies are accelerating their digital transformation on AWS
 
-#### Designing Simple, Resilient Systems
-- Complex systems that work usually evolve from simple systems that worked; avoid designing for complexity from day one
-- Design for failure: any component can break, so decouple parts so one failure does not bring the whole system down
-- Observability is part of the design, not an afterthought
+#### Agentic AI: From Demo to Deployment
+- **The demo-to-production gap:** an agent that works in a demo may not be reliable on real data; it needs testing, monitoring and limited permissions
+- **Agents for software development:** AI can write code, tests, reviews and documentation, but humans remain accountable for quality
+- **Migration at scale with AI:** how AWS Transform uses agents to help modernize and migrate legacy applications
 
-#### Cost as an Architectural Requirement
-- Cost should be considered at design time, just like security or performance
-- Resources running all the time without serving anyone are waste; prefer on-demand or scheduled architectures
-- Measure cost per unit of value (for example cost per forecast) to know whether a system is sustainable
+#### AI-Ready Data Foundations
+- Scattered, non-standardized data is the biggest barrier when bringing AI into products
+- A data lake on Amazon S3 as the foundation, combined with data governance (catalog, access control, data quality)
+- A model is only as good as its input data: data lineage and processing must be traceable
 
-#### AI and the Software Engineering Profession
-- AI makes engineers faster, but engineers remain responsible for correctness, security and quality
-- Core skills matter more than ever: understanding the problem, asking the right questions, verifying results
-- Advice for students: build strong fundamentals, stay curious, build real products rather than only studying theory
+#### Application Modernization and Platform Engineering
+- A Vietnamese bank's story of building an Internal Developer Platform on Amazon EKS
+- Choosing the right tool for the job: complex architectures are not always needed; a simpler solution can be more effective and cheaper
+- An introduction to Amazon Quick with an AI-assistant building challenge for attendees
 
-### Key Takeaways
+### Key Technical Takeaways
 
-- **Start from users:** a product is more useful when it answers what users really need
-- **Simple first, optimize later:** pick a good-enough solution you can measure, then improve
-- **Design for failure and for cost:** both belong in the very first design
-- **A builder's responsibility:** use AI to speed up, but always verify
+- **Agents need guardrails:** least-privilege IAM, a limited tool scope, and logging every action for review
+- **Evaluate before trusting:** a fixed test question set is needed to measure agent quality, not just a few manual tries
+- **Layered data lake:** separate raw, cleaned and feature data, each layer with clear rules
+- **Serverless and managed services:** let small teams focus on the product instead of running servers
 
 ### Personal Learnings
 
-#### A Change in Mindset
-- Before this talk, I thought an AI project should use the most complex model possible. Afterwards, I understood that a simple model evaluated honestly is worth more than a complex model that cannot prove its value
-- I learned to see cost as a design criterion rather than a number checked after the system is built
+#### Technical Growth
+- I understood better that the hard part of real-world AI lies in data, testing and operations, not just the model
+- The part on evaluating agents with a fixed question set helped me picture how our team could test the project chatbot
+
+#### Industry Insights
+- Vietnamese companies, especially in banking and finance, are investing heavily in data platforms and AI
+- Demand is growing for engineers who understand data, models and cloud together
 
 #### Application to the CPAWS Project
-- The team chose a scheduled batch-prediction architecture (EventBridge Scheduler → Lambda) with no 24/7 endpoints, keeping costs within the credit budget
-- A machine learning model replaces the running model only when it is proven better than the statistical baseline — the "measure results" principle
-- Components (ingestion, prediction, chatbot) are decoupled so one failing data source does not stop the whole system
+- Designing the S3 data lake with `raw/`, `clean/`, `features/`, `models/`, `eval/` layers so every number in the report is traceable
+- The chatbot takes numbers only from tools and never makes up figures — the "agent with guardrails" idea repeated throughout the event
+- Preparing a fixed test question set for the chatbot and running the official scoring only once
 
 ### Event Experience
 
-The session had a friendly, close atmosphere. I listened, took notes and followed the exchange between the speaker and the audience. What impressed me most was how the speaker described very simple principles applied consistently at enormous scale, showing that good engineering is about discipline, not complexity.
+This was the first big AWS event I attended since starting my internship. The atmosphere was lively, and hearing real stories first-hand showed me how valuable the Lab skills are once applied in companies. I mostly listened, took notes and followed the presentations; many of those notes later went into our team discussions when designing the CPAWS architecture.
 
-The talk came right when the CPAWS team was about to finalize its architecture, so I brought many of these ideas into our discussions the following week.
+The event also made me more confident in our direction: a useful AI product does not need the most complex model, but trustworthy data, honest evaluation and a stable system.
 
 ### Event Photos
 
-...
+![AWS Cloud & AI Day 2026](/images/4-Event/cloudday.jpg)
