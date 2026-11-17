@@ -29,7 +29,7 @@ The model currently published (`baseline-q252`) is a **252-session statistical b
 
 ![CPAWS current architecture](/images/5-Workshop/CPAWS-architecture-current.png)
 
-*Diagram drawn by the CPAWS team in draw.io, state as of 13/11/2026. Every component on the diagram is deployed and running.*
+*Diagram drawn by the CPAWS team in draw.io (layout revised by Khải on 17/11/2026), state as of 13/11/2026. Every component on the diagram is deployed and running.*
 
 The system has three flows:
 

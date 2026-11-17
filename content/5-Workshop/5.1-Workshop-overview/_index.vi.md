@@ -29,7 +29,7 @@ Mô hình đang phát hành (`baseline-q252`) là **mốc thống kê 252 phiên
 
 ![Kiến trúc CPAWS hiện trạng](/images/5-Workshop/CPAWS-architecture-current.png)
 
-*Sơ đồ do nhóm CPAWS vẽ bằng draw.io, hiện trạng ngày 13/11/2026. Mọi thành phần trên sơ đồ đã được triển khai và đang chạy.*
+*Sơ đồ do nhóm CPAWS vẽ bằng draw.io (Khải chỉnh lại bố cục ngày 17/11/2026), hiện trạng ngày 13/11/2026. Mọi thành phần trên sơ đồ đã được triển khai và đang chạy.*
 
 Hệ thống gồm ba luồng:
 
