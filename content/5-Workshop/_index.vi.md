@@ -35,4 +35,4 @@ Trong workshop này, bạn sẽ học cách:
 
 #### Mã nguồn
 
-Repo của nhóm: [CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting](https://github.com/CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting) (nhánh `developer`).
+Repo của nhóm: [CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting](https://github.com/CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting). Nhánh `production` là bản nộp cuối kỳ (tag `v1.0.1`). Nhánh `developer` là nhánh phát triển: mọi thay đổi vào qua Pull Request, rồi mới được release sang `production`.

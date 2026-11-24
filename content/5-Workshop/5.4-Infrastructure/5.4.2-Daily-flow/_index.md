@@ -108,6 +108,14 @@ aws scheduler get-schedule --name cpaws-dev-ingest-daily \
   --profile cpaws-dev --query "[State,ScheduleExpression]" --output text
 ```
 
-<!-- ẢNH: Console EventBridge Scheduler: lịch cpaws-dev-ingest-daily, trạng thái ENABLED -->
-<!-- ẢNH: Console Lambda cpaws-dev-ingest, tab Configuration > Destinations (OnSuccess, OnFailure -> predict) -->
-<!-- ẢNH: CloudWatch Logs của predict: dòng REPORT (Duration, Max Memory). KHÔNG chụp dòng PREDICT_DONE vì có giá -->
+![EventBridge Scheduler](/images/5-Workshop/5.4.2-scheduler.png)
+
+*EventBridge Scheduler: the two schedules `cpaws-dev-ingest-daily` and `cpaws-dev-accuracy-daily` are Enabled and target Lambda `cpaws-dev-ingest` and `cpaws-dev-accuracy-job`.*
+
+![Lambda Destinations](/images/5-Workshop/5.4.2-lambda-destinations.png)
+
+*Lambda `cpaws-dev-ingest`, tab Configuration > Destinations: both On success and On failure invoke `cpaws-dev-predict`.*
+
+![Predict log](/images/5-Workshop/5.4.2-predict-logs.png)
+
+*Log of `cpaws-dev-predict` for the 19:15 run on 21/11/2026 (base date 20/11): all 4 assets have `n_crossed=0`; the REPORT line shows Duration 3,285.89 ms, Billed Duration 4,848 ms and max memory used 258/1,024 MB. The `PREDICT_DONE` line is masked.*

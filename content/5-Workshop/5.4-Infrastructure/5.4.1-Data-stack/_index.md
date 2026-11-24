@@ -32,7 +32,7 @@ The base image is `public.ecr.aws/lambda/python:3.12`, **pinned by digest** in t
 
 #### Build and push the images
 
-Tag images with the short SHA of the commit merged into `developer`, never `latest`:
+Tag images with the short SHA of the commit merged into `developer`, never `latest`. Releasing to `production` does not rebuild images: version `v1.0.1` runs ingest `5cfde32`, predict `c61abdd` and the accuracy job `e31c928` (built from the predict image).
 
 ```bash
 TAG=$(git rev-parse --short HEAD)
@@ -81,5 +81,14 @@ cat out.json   # each symbol should have about 10 rows and error = null
 
 If the `dry_run` looks fine, load history with the event `{"start": "2012-01-01"}` (invoke with `--invocation-type Event`), then check that `clean/prices/dt=<date>/` exists on S3.
 
-<!-- ẢNH: Console ECR repo cpaws-dev-predict với các tag SHA (che Account ID trong URI) -->
-<!-- ẢNH: Console Lambda cpaws-dev-ingest: Image URI, memory, timeout (che Account ID) -->
+![ECR cpaws-dev-predict](/images/5-Workshop/5.4.1-ecr-predict.png)
+
+*ECR repository `cpaws-dev-predict`: 4 images, each tagged with a commit SHA (`e31c928`, `c61abdd`, `ce77bcb`, `ffeee05`), about 301 MB each.*
+
+![Lambda functions](/images/5-Workshop/5.4.1-lambda-functions.png)
+
+*Lambda: the 6 CPAWS functions. `ingest`, `predict` and `accuracy-job` are container images; `forecasts-api`, `accuracy-api` and `chat-api` are Python 3.12 zip packages.*
+
+![Lambda cpaws-dev-ingest](/images/5-Workshop/5.4.1-lambda-ingest.png)
+
+*Lambda `cpaws-dev-ingest` in stack `CpawsData`: the Image URI points to tag `5cfde32`, architecture x86_64.*

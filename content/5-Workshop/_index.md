@@ -35,4 +35,4 @@ In this workshop, you will learn how to:
 
 #### Source code
 
-Team repository: [CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting](https://github.com/CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting) (branch `developer`).
+Team repository: [CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting](https://github.com/CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting). Branch `production` is the final submission (tag `v1.0.1`). Branch `developer` is the development branch: every change goes in through a Pull Request and is then released to `production`.
