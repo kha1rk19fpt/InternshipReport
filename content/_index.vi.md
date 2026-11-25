@@ -19,7 +19,7 @@ chapter: false
 
 &emsp; **Ngành:** Trí Tuệ Nhân Tạo
 
-&emsp; **Lớp:** ...
+&emsp; **Lớp:** FCAJ-FPT-Season 4
 
 &emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Vietnam
 
