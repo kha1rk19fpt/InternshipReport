@@ -21,7 +21,7 @@ chapter: false
 
 &emsp; **Major:** Artificial Intelligence
 
-&emsp; **Class:** ...
+&emsp; **Class:** FCAJ-FPT-Season 4
 
 &emsp; **Internship Company:** Amazon Web Services Vietnam Co., Ltd.
 
