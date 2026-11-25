@@ -27,7 +27,7 @@ Hệ thống chạy hoàn toàn trên AWS theo kiến trúc **serverless chạy 
 
 ---
 
-## 2. Phát biểu Vấn đề
+## 2. Về vấn đề giải quyết:
 
 ### Vấn đề là gì?
 
@@ -58,7 +58,7 @@ Chatbot trên Amazon Bedrock chỉ lấy con số từ hệ thống qua **tool u
 
 ---
 
-## 3. Kiến trúc Giải pháp
+## 3. Kiến trúc giải pháp
 
 ### Tổng quan
 
@@ -132,7 +132,7 @@ Tín hiệu ngoài giá gồm chỉ số rủi ro địa chính trị (GPR), ch�
 
 ---
 
-## 5. Lịch trình & Cột mốc
+## 5. Lịch trình xây dựng kiến trúc
 
 | Giai đoạn | Hoạt động |
 |---|---|
@@ -140,8 +140,8 @@ Tín hiệu ngoài giá gồm chỉ số rủi ro địa chính trị (GPR), ch�
 | Tuần 1–2 (12–25/10) | Kiến trúc, dữ liệu sạch, target và cách đánh giá, pipeline thu thập |
 | Tuần 3–4 (26/10–08/11) | Mốc so sánh, DLinear MVP, Lambda dự đoán, API và chatbot bản đầu |
 | Tuần 5–6 (09–22/11) | Luồng hằng ngày tự động, tín hiệu tin tức, đánh giá; đóng băng tính năng 22/11 |
-| Tuần 7 (23–29/11) | Ổn định hệ thống, báo cáo cuối kỳ, tổng duyệt |
-| Cuối 11 – đầu 12/2026 | Trình bày trước hội đồng thực tập FCAJ-AWS |
+| Tuần 7 (23–29/11) | Ổn định hệ thống, báo cáo cuối kỳ, kiểm tra đánh giá toàn bộ hệ thống |
+| Cuối 11 – đầu 12/2026 | Nộp kiến trúc hệ thống và gửi video demo cho FCAJ |
 
 ---
 
