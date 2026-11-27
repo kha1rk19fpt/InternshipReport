@@ -6,32 +6,22 @@ chapter: false
 pre: " <b> 4.1. </b> "
 ---
 
-# Báo Cáo Tóm Tắt: "Buildrathon Kickoff: Code the Future with CMC Global"
+# Sự kiện: "Buildrathon Kickoff: Code the Future with CMC Global"
 
-### Tổng Quan Sự Kiện
+### Tổng quan sự kiện
 
 - **Tên Sự Kiện:** Buildrathon Kickoff: Code the Future with CMC Global  
 - **Ngày:** 26/09/2026  
 - **Vai Trò:** Người tham dự  
-- **Hình Thức:** Buổi kickoff nửa ngày: giới thiệu, talkshow, hỏi đáp và một thử thách thực hành ngắn  
+- **Hình Thức:** Buổi kickoff nửa ngày: giới thiệu, talkshow, và hỏi đáp
 - **Địa Điểm:** Tòa nhà Bitexco Financial Tower, Quận 1, TP.HCM  
 - **Chương Trình:** [Trang sự kiện](https://luma.com/8fe9vvps)
 
-Đây là buổi khởi động cuộc thi Buildathon tổ chức cùng CMC Global. Buổi kickoff giới thiệu thử thách, tiêu chí chấm điểm và cho người tham dự cái nhìn tổng quan về AWS Cloud, generative AI và cách xây dựng AI agent bằng các dịch vụ AWS. Đây là sự kiện AWS đầu tiên tôi tham gia trong kỳ thực tập.
 
-### Chương Trình
-
-- **Buildathon kickoff:** mục tiêu cuộc thi, tiêu chí chấm điểm, tổng quan AWS Cloud, generative AI và AI agent trên AWS
-- **Ice-breaking:** người tham dự tự giới thiệu và làm quen với các đồng đội tiềm năng
-- **Talkshow "Building a Career in Cloud & AI":** diễn giả chia sẻ xu hướng cloud và AI, dự án thực tế và lộ trình nghề nghiệp, sau đó là phần hỏi đáp
-- **Hands-on: AI Agent Challenge:** thử thách ngắn về prompt engineering, retrieval-augmented generation (RAG), knowledge base và AI agent, có mentor hỗ trợ
-- **Bế mạc và phỏng vấn thử:** tổng kết, chụp ảnh chung, sau đó là phần phỏng vấn thử (tự chọn) cho các vị trí Cloud, DevOps, Data và Solutions Architect
-
-### Phần Tôi Tham Gia
+### Phần bản thân đã tham gia
 
 - Tôi tham dự phần kickoff, talkshow và hỏi đáp
 - Ở phần hands-on, tôi trả lời quiz chung cùng cả phòng
-- Tôi không tham gia phỏng vấn thử và không đăng ký đội thi Buildathon
 
 ### Điều Rút Ra
 
