@@ -11,7 +11,7 @@ pre: " <b> 1.5. </b> "
 - Làm chủ kỹ năng Hosting Website tĩnh trên S3 kết hợp với CloudFront để tối ưu hiệu năng và bảo mật.
 - Thực hành triển khai, quản trị và sao lưu cơ sở dữ liệu quan hệ với Amazon RDS.
 - Xây dựng kiến trúc hệ thống có khả năng tự động mở rộng (Scalability) và chịu lỗi cao (High Availability) sử dụng Auto Scaling Group và Load Balancer.
-- Viết đề cương dự án (Proposal) CPAWS cùng team, phụ trách phần mô hình dự báo và đánh giá.
+- Viết bản đề xuất dự án Proposal CPAWS cùng team, phụ trách phần mô hình dự báo và đánh giá.
 
 ### CÁC ĐẦU VIỆC CỦA WEEK 5:
 
