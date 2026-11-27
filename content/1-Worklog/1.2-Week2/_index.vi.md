@@ -23,7 +23,7 @@ pre: " <b> 1.2. </b> "
 | **6** | **- Họp team project: lên ý tưởng, phân tích, nghiên cứu để chọn lọc idea phù hợp**<br>+ Nhóm CPAWS (5 thành viên) thống nhất cách làm việc và kênh trao đổi<br>+ Đề xuất hướng dự báo giá hàng hóa giao dịch chung giữa thế giới và Việt Nam (vàng, bạc, dầu thô) | 25/09/2026 | 25/09/2026 | [World Bank Commodity Markets](https://www.worldbank.org/en/research/commodity-markets) |
 
 ### THÀNH TỰU ĐẠT ĐƯỢC TRONG WEEK 2:
-1. Đã được lên văn phòng AWS lần đầu tiên, và thành lập team.
+1. Đã được lên văn phòng AWS lần đầu tiên.
 2. Hoàn thành Lab 4, thành thạo việc tạo IAM User, Group và Role để phân quyền truy cập hợp lý.
 3. Xây dựng thành công hạ tầng mạng VPC với đầy đủ các thành phần: Subnet, Route Table, IGW, NAT Gateway.
 4. Cấu hình bảo mật mạng nhiều lớp sử dụng Security Groups và Network ACLs.
