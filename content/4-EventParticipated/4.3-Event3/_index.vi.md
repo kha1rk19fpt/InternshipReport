@@ -6,14 +6,14 @@ chapter: false
 pre: " <b> 4.3. </b> "
 ---
 
-# Báo Cáo Tóm Tắt: "Fireside Chat with Dr. Werner"
+# Sự kiện: "Fireside Chat with Dr. Werner"
 
 ### Tổng Quan Sự Kiện
 
 - **Tên Sự Kiện:** Fireside Chat with Dr. Werner (CTO AWS), cùng cộng đồng AWS FCAJ HCM  
 - **Ngày:** 2 tháng 10, 2026  
 - **Vai Trò:** Người tham dự  
-- **Hình Thức:** Buổi chia sẻ và trò chuyện trực tiếp  
+- **Hình Thức:** Buổi talkshow trực tiếp  
 - **Địa Điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, Quận 1, TP.HCM  
 
 Buổi gặp gỡ được cộng đồng AWS FCAJ HCM tổ chức và thông báo trên các kênh của chương trình. Đây là dịp hiếm hoi để thực tập sinh được nghe trực tiếp một lãnh đạo công nghệ cấp cao của AWS chia sẻ về cách Amazon xây dựng hệ thống, văn hóa kỹ thuật và những điều người kỹ sư trẻ cần chuẩn bị trong thời đại AI. Phòng sự kiện kín chỗ, với sự tham gia của thực tập sinh, mentor và thành viên cộng đồng.
@@ -38,7 +38,6 @@ Buổi gặp gỡ được cộng đồng AWS FCAJ HCM tổ chức và thông b�
 #### AI và nghề kỹ sư phần mềm
 - AI giúp kỹ sư làm nhanh hơn, nhưng người kỹ sư vẫn chịu trách nhiệm về tính đúng đắn, bảo mật và chất lượng
 - Kỹ năng quan trọng hơn bao giờ hết: hiểu vấn đề, đặt câu hỏi đúng, kiểm chứng kết quả
-- Lời khuyên cho sinh viên: học nền tảng thật chắc, luôn tò mò, xây sản phẩm thật thay vì chỉ học lý thuyết
 
 ### Kiến Thức Rút Ra
 
@@ -53,16 +52,10 @@ Buổi gặp gỡ được cộng đồng AWS FCAJ HCM tổ chức và thông b�
 - Trước buổi chia sẻ, tôi nghĩ dự án AI phải dùng mô hình càng phức tạp càng tốt. Sau buổi này, tôi hiểu rằng một mô hình đơn giản nhưng được đánh giá trung thực có giá trị hơn một mô hình phức tạp không chứng minh được hiệu quả
 - Tôi học được cách nhìn chi phí như một tiêu chí thiết kế chứ không phải con số kiểm tra sau khi đã xây xong
 
-#### Ứng Dụng Cho Dự Án CPAWS
-- Nhóm chọn kiến trúc dự đoán theo lô chạy theo lịch (EventBridge Scheduler → Lambda), không dùng endpoint chạy 24/7, giữ chi phí trong ngân sách credit
-- Mô hình học máy chỉ được thay mô hình đang chạy khi chứng minh được tốt hơn mốc thống kê, đúng với tinh thần "đo lường được kết quả"
-- Tách các thành phần (thu thập, dự đoán, chatbot) để một nguồn dữ liệu lỗi không làm dừng toàn hệ thống
 
 ### Trải Nghiệm Sự Kiện
 
-Buổi gặp gỡ diễn ra trong không khí gần gũi. Tôi ngồi lắng nghe, ghi chép và theo dõi phần trao đổi giữa diễn giả với khán giả. Điều tôi ấn tượng nhất là cách diễn giả nói về những nguyên tắc rất đơn giản nhưng được áp dụng nhất quán ở quy mô cực lớn, cho thấy kỹ thuật tốt không nằm ở sự phức tạp mà ở sự kỷ luật.
-
-Buổi chia sẻ đến đúng lúc nhóm CPAWS đang chuẩn bị chốt kiến trúc, nên nhiều ý tưởng được tôi mang về thảo luận ngay trong tuần sau đó.
+Buổi gặp gỡ diễn ra trong không khí gần gũi. Tôi ngồi cố gắng lắng nghe, và cố gắng ghi chép các keyword mà Dr.Werner chia sẽ. Điều tôi ấn tượng nhất là cách diễn giả nói về những nguyên tắc rất đơn giản nhưng được áp dụng nhất quán ở quy mô cực lớn, cho thấy kỹ thuật tốt không nằm ở sự phức tạp mà ở sự kỷ luật.
 
 ### Ảnh Sự Kiện
 
