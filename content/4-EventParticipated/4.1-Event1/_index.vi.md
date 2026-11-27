@@ -33,3 +33,5 @@ pre: " <b> 4.1. </b> "
 ![Buildrathon Kickoff: Code the Future with CMC Global](/images/4-Event/buildrathon2.jpg)
 
 ![Tại buổi Buildrathon Kickoff](/images/4-Event/buildrathon1.jpg)
+
+![Ảnh tự chụp tại buổi Buildrathon Kickoff](/images/4-Event/buildrathon3.jpg)

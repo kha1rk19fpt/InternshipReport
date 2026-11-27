@@ -6,11 +6,11 @@ chapter: false
 pre: " <b> 4.5. </b> "
 ---
 
-# Sự kiện: "Cloud Mastery 1"
+# Sự kiện: "Cloud Mastery"
 
 ### Tổng Quan Sự Kiện
 
-- **Tên Sự Kiện:** Cloud Mastery 1  
+- **Tên Sự Kiện:** Cloud Mastery  
 - **Ngày:** 14/11/2026  
 - **Vai Trò:** Người tham dự  
 - **Hình Thức:** Buổi chia sẻ kỹ thuật  
@@ -27,7 +27,8 @@ pre: " <b> 4.5. </b> "
 #### Bốn trụ cột trên AWS
 
 - **Bảo mật:** AWS KMS bảo vệ dữ liệu, AWS IAM kiểm soát truy cập, guardrails xử lý các rủi ro riêng của AI, ví dụ người dùng cố khiến model trả lời sai.
-- **Khả năng mở rộng và độ tin cậy:** AWS Lambda, Auto Scaling và Elastic Load Balancing đáp ứng lưu lượng thay đổi, kết hợp health check, retry, failover và cảnh báo.
+- **Khả năng mở rộng:** AWS Lambda, Auto Scaling và Elastic Load Balancing đáp ứng lưu lượng thay đổi.
+- **Độ tin cậy:** health check, retry, failover và cảnh báo giúp hệ thống tiếp tục chạy khi một thành phần gặp lỗi.
 - **Tối ưu chi phí:** trả theo mức dùng, chọn đúng cấu hình, dùng cache. Với AI, một model lớn điều phối còn các model nhỏ, rẻ hơn xử lý tác vụ đơn giản; câu hỏi lặp lại thì trả từ cache.
 
 #### Amazon Bedrock AgentCore
@@ -60,4 +61,4 @@ pre: " <b> 4.5. </b> "
 
 ### Ảnh Sự Kiện
 
-![Cloud Mastery 1](/images/4-Event/cloud_mastery_1.jpg)
+![Cloud Mastery](/images/4-Event/cloud_mastery_1.jpg)

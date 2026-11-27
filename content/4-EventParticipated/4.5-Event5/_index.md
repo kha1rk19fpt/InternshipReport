@@ -6,38 +6,59 @@ chapter: false
 pre: " <b> 4.5. </b> "
 ---
 
-# Summary Report: "Cloud Mastery 1"
+# Event: "Cloud Mastery"
 
 ### Event Overview
 
-- **Event Name:** Cloud Mastery 1  
-- **Date:** November 14, 2026  
+- **Event Name:** Cloud Mastery  
+- **Date:** 14/11/2026  
 - **Role:** Attendee  
 - **Format:** Technical talk  
-- **Location:** Floor 26, Bitexco Financial Tower, District 1, Ho Chi Minh City  
-- **Main Topic:** Amazon Bedrock AgentCore
+- **Location:** 26th floor, Bitexco Financial Tower, District 1, Ho Chi Minh City  
+- **Main Topic:** Taking AI from prototype to production, Amazon Bedrock AgentCore
 
-Cloud Mastery 1 was a technical session whose main topic was Amazon Bedrock AgentCore. The opening part, "AI in the Enterprise", placed AI inside a product rather than treating it as the product: data are the ingredients, the AI model is built on them, a feature is built on the model, and users meet the AI only through that feature.
+### Activities
 
-### Amazon Bedrock AgentCore in Brief
+#### From Prototype to Production
 
-*Summarized from public AWS material.*
+- The speaker compared AI in academia with AI in the enterprise using the image of a home kitchen and a restaurant chain. Enterprise AI is judged by business value, not only by accuracy; it has to work with constantly changing data and serve a very large number of users 24/7.
+- The model is only one part of a production system. Alongside the model, you also need data pipelines, monitoring, security, scalability, reliability and cost control.
 
-- Amazon Bedrock provides foundation models; AgentCore is a set of managed services for running agents built on those models in production
-- Main components include **Runtime** (where the agent code runs), **Gateway** (turns APIs and Lambda functions into tools for the agent), **Memory** (short-term and long-term context), **Identity** (authentication for agents and their users), **Observability**, plus built-in tools such as Code Interpreter and Browser
-- The components can be adopted one at a time; a team does not have to use the whole set
+#### Four Pillars on AWS
 
-### Connection to the CPAWS Project
+- **Security:** AWS KMS protects data, AWS IAM controls access, and guardrails handle AI-specific risks, for example users trying to make the model give wrong answers.
+- **Scalability:** AWS Lambda, Auto Scaling and Elastic Load Balancing handle changing traffic.
+- **Reliability:** health checks, retries, failover and alerts keep the system running when a component fails.
+- **Cost optimization:** pay for what you use, choose the right configuration, use caching. For AI, a large model orchestrates while smaller, cheaper models handle simple tasks; repeated questions are answered from the cache.
 
-- The event came about a week before the CPAWS feature freeze (22/11), when the team's chatbot was already running
-- The CPAWS chatbot is a small, hand-built version of the same pieces: the `chat-api` Lambda function plays the role of the runtime, two Python tools (`get_forecast`, `get_news`) are called through the Bedrock Converse API, users sign in with Amazon Cognito, and daily usage limits are stored in DynamoDB. There is no long-term conversation memory
-- If the chatbot grows (more tools, memory across sessions), AgentCore Gateway, Memory and Identity are the parts worth evaluating instead of building more infrastructure ourselves
+#### Amazon Bedrock AgentCore
+
+- The Duolingo case study showed the benefits of a shared agent platform, instead of each team rebuilding the same infrastructure.
+- A demo of an order-lookup agent written with the Strands Agents SDK, running on AgentCore Runtime (managed compute, isolated sessions, automatic scaling). Even with a managed runtime, the development team is still responsible for business rules, data, tools and testing.
+- **Identity** separates inbound authentication (who the user is and whether they may call the agent) from outbound authentication (what the agent may access on the user's behalf).
+- **Gateway** gives the agent a single, secure access point to many tools, APIs and MCP servers.
+- **Memory** includes short-term memory for the current conversation and long-term memory for user preferences and summaries.
+- **Observability** integrates with Amazon CloudWatch and tracks each step of the agent: model calls, tool calls, latency, token counts.
+
+#### Q&A and Closing
+
+- Attendees asked the speaker questions, took a mini quiz, filled in a feedback form and took souvenir photos.
+
+### What I Learned
+
+#### Production-Ready AI
+
+- A working model is only the starting point; security, scalability, reliability and cost must be designed in from the beginning.
+
+#### Agent Architecture
+
+- Understanding how an agent framework such as Strands works with a managed platform such as AgentCore, and why identity, tool access and memory should use shared components instead of being rebuilt in each project.
+
+#### Agent Security and Monitoring
+
+- Separate inbound and outbound permissions, and give each agent only the permissions it needs.
+- Agents often give wrong answers without reporting an error, so every run needs to be logged, monitored and measured against goals set in advance.
 
 ### Event Photos
 
-![Cloud Mastery 1](/images/4-Event/cloud_mastery_1.jpg)
-
-### References
-
-- [Amazon Bedrock AgentCore](https://aws.amazon.com/bedrock/agentcore/)
-- [What is Amazon Bedrock AgentCore? (Developer Guide)](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html)
+![Cloud Mastery](/images/4-Event/cloud_mastery_1.jpg)
