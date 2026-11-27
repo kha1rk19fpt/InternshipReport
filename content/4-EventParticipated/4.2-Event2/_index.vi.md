@@ -17,7 +17,6 @@ pre: " <b> 4.2. </b> "
 - **Địa Điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, Quận 1, TP.HCM  
 - **Chương trình:** [Agenda sự kiện](https://aws.amazon.com/events/cloud-day-hanoi/agenda/)
 
-AWS Cloud & AI Day là sự kiện thường niên của AWS tại Việt Nam, quy tụ chuyên gia AWS, đối tác và doanh nghiệp để chia sẻ xu hướng mới về cloud và AI. Năm 2026, chủ đề nổi bật nhất là agentic AI: làm sao đưa các AI agent từ bản demo ra vận hành thật, và nền tảng dữ liệu cần có để AI hoạt động đáng tin cậy. Cùng các bạn thực tập sinh FCAJ, tôi theo dõi sự kiện tại tầng 26, văn phòng AWS TP.HCM.
 
 ### Các Điểm Nổi Bật Trong Chương Trình
 
@@ -59,11 +58,6 @@ Keynote xoay quanh câu hỏi: cần gì để giải những bài toán mà ai 
 #### Insights Ngành
 - Doanh nghiệp Việt Nam, đặc biệt là ngân hàng và tài chính, đang đầu tư mạnh vào nền tảng dữ liệu và AI
 - Nhu cầu về kỹ sư hiểu cả dữ liệu, mô hình và cloud ngày càng lớn
-
-#### Ứng Dụng Cho Dự Án CPAWS
-- Thiết kế data lake trên S3 theo tầng `raw/`, `clean/`, `features/`, `models/`, `eval/` để mọi con số trong báo cáo đều truy ngược được
-- Chatbot chỉ được lấy con số từ tool, không tự tạo số liệu; đây chính là tinh thần "agent có hàng rào" được nhắc nhiều trong sự kiện
-- Chuẩn bị bộ câu hỏi kiểm thử cố định cho chatbot và chỉ chạy chấm điểm chính thức một lần
 
 ### Trải Nghiệm Sự Kiện
 
