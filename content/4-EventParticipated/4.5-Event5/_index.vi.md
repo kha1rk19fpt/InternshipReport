@@ -30,12 +30,6 @@ pre: " <b> 4.5. </b> "
 - **Khả năng mở rộng và độ tin cậy:** AWS Lambda, Auto Scaling và Elastic Load Balancing đáp ứng lưu lượng thay đổi, kết hợp health check, retry, failover và cảnh báo.
 - **Tối ưu chi phí:** trả theo mức dùng, chọn đúng cấu hình, dùng cache. Với AI, một model lớn điều phối còn các model nhỏ, rẻ hơn xử lý tác vụ đơn giản; câu hỏi lặp lại thì trả từ cache.
 
-#### Case study: Cox Automotive và Mobileye
-
-- **Cox Automotive** xác định 57 cơ hội dùng agentic AI nhưng vướng hai vấn đề: agent cần quyền tối thiểu với dữ liệu nhạy cảm, và chưa có môi trường chuẩn để chạy agent. Sau khi chuẩn hóa trên AgentCore Runtime, AgentCore Identity và Amazon Bedrock Guardrails, công ty đưa được 17 giải pháp agent vào production.
-- **Mobileye** có 66% ticket hỗ trợ là câu hỏi trạng thái thông thường. Một support agent chạy trên AgentCore Runtime nối với hệ thống ticket on-premises, dùng AWS Secrets Manager và MCP để gọi dịch vụ nội bộ, rút thời gian phản hồi từ vài giờ xuống khoảng một phút.
-- Ba bài học của phần này: đưa bảo mật và khả năng mở rộng vào nền tảng ngay từ đầu; agent chỉ có giá trị khi nối được với hệ thống và dữ liệu thật; không thể tin một agent nếu không đo lường được nó.
-
 #### Amazon Bedrock AgentCore
 
 - Case study Duolingo cho thấy lợi ích của một nền tảng agent dùng chung, thay vì mỗi nhóm tự dựng lại cùng một bộ hạ tầng.
