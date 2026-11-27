@@ -116,7 +116,7 @@ Tín hiệu ngoài giá gồm chỉ số rủi ro địa chính trị (GPR), ch�
 | Khởi động CEEMDAN | 2012–2013 |
 | Huấn luyện | 2014–2018 |
 | Validation (chọn tham số) | 2019 |
-| Kiểm tra (chỉ chạy một lần sau khi khóa tham số) | 2020 → nay |
+| Kiểm tra (chỉ chạy một lần sau khi khóa tham số) | 2020 -> nay |
 
 - **Chỉ số chính:** pinball skill so với mốc phân vị 252 phiên.
 - **Hiệu chỉnh khoảng dự đoán:** tỷ lệ giá thực rơi vào khoảng 80%, độ rộng khoảng, interval score.
