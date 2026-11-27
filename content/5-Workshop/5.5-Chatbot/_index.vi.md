@@ -33,7 +33,7 @@ Chatbot giúp người dùng đọc dự báo bằng tiếng Việt: hỏi về 
 |---|---|
 | Model | Claude Haiku 4.5 qua inference profile **global** (cross-Region inference), gọi từ `ap-southeast-1` |
 | API | Converse (không stream), `temperature` 0, `maxTokens` 1500, `toolChoice: auto` |
-| Quyền IAM | Chỉ `bedrock:InvokeModel` trên đúng ARN của inference profile và model; `dynamodb:Query` trên bảng `forecasts` |
+| Quyền IAM | `bedrock:InvokeModel` cho Claude Haiku 4.5 và Nova 2 Lite (Nova được cấp sẵn cho router nhưng chưa dùng), mỗi model 3 statement theo hướng dẫn global cross-Region inference: inference profile, model trong region và model global, hai statement sau có điều kiện `bedrock:InferenceProfileArn`; `dynamodb:Query` trên bảng `forecasts` và `news-labels`; `dynamodb:UpdateItem`, `dynamodb:GetItem` trên bảng `chat-usage` (bộ đếm lượt hỏi) |
 | Không dùng | Knowledge Bases, embedding, fine-tune. Tin tức đọc trực tiếp từ dữ liệu đã gắn nhãn |
 
 Dùng inference profile global thì Bedrock có thể xử lý request ở region khác. Nhóm ghi rõ trong ADR-0004 rằng không cam kết mọi request được xử lý hoàn toàn trong Singapore.
@@ -130,7 +130,7 @@ Nhóm **không bật Bedrock Guardrails** trong phạm vi đồ án (quyết đ�
 
 ![Hỏi tin tức](/images/5-Workshop/5.5-chat-forecast-news2.png)
 
-*Hỏi "Có tin gì mới của Fed không?": trong 7 ngày (17/11–24/11/2026) không có tin Fed đã gắn nhãn liên quan tới vàng, nên chatbot nói không tìm thấy thay vì tự đưa ra tin.*
+*Hỏi "Có tin gì mới của Fed không?": chatbot trả lời không tìm thấy tin Fed trong 7 ngày (17/11–24/11/2026), dù bộ tin có biên bản FOMC đăng ngày 18/11 (mức tác động 2). Đây là một lỗi bỏ sót, ghi ở mục "Hạn chế đã biết".*
 
 ![Từ chối tư vấn](/images/5-Workshop/5.5-chat-refuse-advice.png)
 
@@ -145,3 +145,4 @@ Các lỗi dưới đây gặp khi nhóm hỏi thử trên Production sau bản 
 - **Ngày đăng tin lệch một ngày:** câu trả lời ghi ngày theo UTC của tin (ví dụ biên bản FOMC đăng 18/11), còn thẻ Nguồn trên web đổi sang giờ Việt Nam (19/11).
 - **Diễn giải khoảng dự báo:** có câu gọi q10/q90 là mức "giảm tối đa/tăng tối đa", trong khi đó chỉ là biên của khoảng 80%.
 - **Tự thêm nhận định chung** không có trong tin, ví dụ "lãi suất cao làm vàng kém hấp dẫn vì chi phí cơ hội tăng".
+- **Bỏ sót tin đã có:** câu hỏi không nêu tài sản như "Có tin gì mới của Fed không?" có lúc nhận câu trả lời "không tìm thấy", dù biên bản FOMC ngày 18/11 nằm trong khoảng 7 ngày và đạt mức tác động 2. Khi hỏi rõ tài sản và khoảng ngày, chatbot đã trả đúng tin này (hỏi thử ngày 23–24/11).

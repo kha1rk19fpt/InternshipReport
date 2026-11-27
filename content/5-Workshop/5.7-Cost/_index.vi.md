@@ -97,7 +97,7 @@ Các đề xuất dưới đây **chưa làm**; mỗi đề xuất cần đo tr�
 - Giảm token đầu vào của chatbot (bớt ngữ cảnh lặp, tool chỉ trả trường cần thiết). Giảm 20% token đầu vào thì tiết kiệm khoảng 0,62 USD/tháng, tức 12% tổng dự toán.
 - Thử lại router đưa câu đơn giản sang Nova 2 Lite, chỉ khi đạt ngưỡng trên bộ câu mới.
 - Đo lại bộ nhớ của từng Lambda (256/512/1.024 MB) và cân nhắc ARM nếu image và thư viện tương thích.
-- Một log group cũ vẫn giữ log 2 năm; rà lại thời gian lưu cho đồng nhất với mức 1 tháng.
+- Một log group cũ tạo ngoài CDK vẫn giữ log 2 năm; rà lại thời gian lưu cho đồng nhất với mức 1 tháng.
 - Thêm ngưỡng cảnh báo 50/80/100% cho budget, phù hợp với mức chi phí thấp hiện tại.
 
 #### Đối chiếu với AWS Well-Architected

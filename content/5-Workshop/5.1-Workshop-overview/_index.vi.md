@@ -29,7 +29,7 @@ Mô hình đang phát hành (`baseline-q252`) là **mốc thống kê 252 phiên
 
 ![Kiến trúc CPAWS hiện trạng](/images/5-Workshop/CPAWS-architecture-current.png)
 
-*Sơ đồ do nhóm CPAWS vẽ bằng draw.io (Khải chỉnh lại bố cục ngày 17/11/2026), hiện trạng ngày 13/11/2026. Mọi thành phần trên sơ đồ đã được triển khai và đang chạy.*
+*Sơ đồ do nhóm CPAWS vẽ bằng draw.io (Khải chỉnh lại bố cục ngày 17/11/2026). Mọi thành phần trên sơ đồ đã được triển khai và đang chạy.*
 
 Hệ thống gồm ba luồng:
 
@@ -63,12 +63,12 @@ Trong quá trình làm, kiến trúc được rút gọn so với [bản đề x
 |---|---|---|
 | Step Functions và SageMaker AI để huấn luyện lại hằng tuần | Hai Lambda nối bằng destination, không huấn luyện lại | Mốc 252 phiên không cần artifact mô hình; mô hình học máy chưa vượt mốc (ADR-0011, ADR-0012) |
 | Secrets Manager | SSM Parameter Store `SecureString` | Chỉ có một key, không cần xoay vòng tự động; chi phí gần như bằng 0 |
-| Gắn nhãn tin bằng Bedrock (Nova 2 Lite) | Gắn nhãn tay 2–3 thông cáo Fed/EIA mỗi tuần | Lần kiểm trên 49 thông cáo thật không đạt ngưỡng (ADR-0013) |
+| Gắn nhãn tin bằng Bedrock (Nova 2 Lite) | Chỉ gắn nhãn tay thông cáo Fed/EIA trong quá trình phát triển; hiện sản phẩm đã đóng băng nên không cập nhật thêm | Lần kiểm trên 49 thông cáo thật không đạt ngưỡng (ADR-0013) |
 | Router chọn giữa Nova và Haiku | Mọi câu hỏi đi Claude Haiku 4.5 | Router không đạt ngưỡng trên bộ câu giữ riêng (mục [5.5](../5.5-chatbot/)) |
 | Bedrock Guardrails, Knowledge Bases | Không bật | Kiểm soát bằng quy tắc prompt, tool và kiểm tra phía server (quyết định ngày 11/11/2026) |
 
 #### Demo sản phẩm
 
 - Production (Amplify Hosting): [https://dev.d2qw1ouvpqt0l9.amplifyapp.com](https://dev.d2qw1ouvpqt0l9.amplifyapp.com). Trang giới thiệu xem được khi chưa đăng nhập; dự báo, độ chính xác, hướng dẫn đọc và chatbot cần tài khoản. Người chấm tự tạo tài khoản bằng nút **Tạo tài khoản** (xác minh qua email). Tự đăng ký chỉ mở trong thời gian chấm và đóng chậm nhất ngày 10/12/2026.
-- Video demo: [CẬP NHẬT LINK VIDEO]
+- Video demo: [https://youtu.be/useqd8Wokqw](https://youtu.be/useqd8Wokqw)
 - Mã nguồn: [CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting](https://github.com/CPAWS-AWS-FCAJ/CPAWS-commodity-forecasting), nhánh `production` (tag `v1.0.1`).

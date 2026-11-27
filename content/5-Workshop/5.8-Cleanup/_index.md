@@ -67,13 +67,13 @@ aws ssm delete-parameter --name /cpaws/dev/eia-api-key --profile cpaws-dev
 ```
 
 - Delete app `cpaws-dev-web` in the Amplify Console.
-- Delete SNS topic `cpaws-dev-alarms` and its email subscription if they remain.
 - Keep the CDK bootstrap bucket, repository and parameter, and the AWS managed KMS keys, if the account is shared.
 - Keep AWS Budgets for a few more days to see whether any cost is still incurred, then delete it.
 
 #### Check after cleanup
 
 - CloudFormation has no `Cpaws*` stacks left. Delete the bootstrap stack `CDKToolkit` only if CDK is no longer used in the account.
+- SNS topic `cpaws-dev-alarms` belongs to stack `CpawsOps`, so it is gone once that stack is deleted; confirm in the SNS Console.
 - No bucket, DynamoDB table, User Pool or log group of the project remains.
 - Check AWS Billing and Cost Explorer the next day and after the next billing period: billing data lags, so do not expect the cost to drop to zero immediately.
 - Record the resources kept on purpose, why, and who owns them.

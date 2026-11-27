@@ -52,7 +52,7 @@ Predict billed-duration logs average approximately 5.393 seconds; the estimate u
 | --- | --- | --- |
 | S3 storage | ~89.25 MB lake + ~1.06 MB CDK assets; snapshot inventory | 0.10 GB-Mo |
 | S3 Tier 1 / Tier 2 | 218 / 3381 requests, 17–23/11 → ×30/7 | 934 / 14490 requests |
-| DynamoDB on-demand | 4 bảng / tables; final Calculator inputs; historical measurement detail not retained here | 6381 RRU; 11310 WRU; 0.00158 GB-Mo |
+| DynamoDB on-demand | 4 tables; final Calculator inputs; historical measurement detail not retained here | 6381 RRU; 11310 WRU; 0.00158 GB-Mo |
 | Amplify storage | 0.0038870168 GB usage 01–23/11; 20 active days (04–23/11) → ×30/20 | 0.006 GB |
 | Amplify outbound | 5,547,694 bytes / 2 days (22–23/11) → 83,215,410 bytes / 30 days | 0.084 GB |
 | ECR storage | 0.7476365831 GB-Mo / 23 days → ×30/23; 8 visible images in 2 repos | 0.98 GB-Mo |
@@ -145,4 +145,4 @@ Quantities and costs come directly from the Pricing Calculator export, without i
 - **R9.** Additional pricing references: [Lambda](https://aws.amazon.com/lambda/pricing/), [API Gateway](https://aws.amazon.com/api-gateway/pricing/), [DynamoDB](https://aws.amazon.com/dynamodb/pricing/), [S3](https://aws.amazon.com/s3/pricing/), [Amplify](https://aws.amazon.com/amplify/pricing/), [Cognito](https://aws.amazon.com/cognito/pricing/), [ECR](https://aws.amazon.com/ecr/pricing/), [CloudWatch](https://aws.amazon.com/cloudwatch/pricing/), [SNS](https://aws.amazon.com/sns/pricing/).
 - **R10.** [AWS Budgets](https://aws.amazon.com/aws-cost-management/aws-budgets/) and [AWS Cost Anomaly Detection](https://aws.amazon.com/aws-cost-management/aws-cost-anomaly-detection/).
 
-*Pricing snapshot is dated Nov 23–24, 2026; linked prices and benefits can change. / Mốc giá 23–24/11/2026; bảng giá và ưu đãi có thể thay đổi.*
+*Pricing snapshot is dated Nov 23–24, 2026; linked prices and benefits can change.*

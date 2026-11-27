@@ -33,7 +33,7 @@ The chatbot helps users read the forecasts in Vietnamese: questions about gold, 
 |---|---|
 | Model | Claude Haiku 4.5 through the **global** inference profile (cross-Region inference), called from `ap-southeast-1` |
 | API | Converse (no streaming), `temperature` 0, `maxTokens` 1500, `toolChoice: auto` |
-| IAM permissions | Only `bedrock:InvokeModel` on the exact ARNs of the inference profile and model; `dynamodb:Query` on the `forecasts` table |
+| IAM permissions | `bedrock:InvokeModel` for Claude Haiku 4.5 and Nova 2 Lite (Nova is granted for the router but not used yet), three statements per model following the global cross-Region inference guide: the inference profile, the in-Region model and the global model, the last two conditioned on `bedrock:InferenceProfileArn`; `dynamodb:Query` on the `forecasts` and `news-labels` tables; `dynamodb:UpdateItem` and `dynamodb:GetItem` on the `chat-usage` table (question counter) |
 | Not used | Knowledge Bases, embeddings, fine-tuning. News is read directly from labelled data |
 
 With the global inference profile, Bedrock may process a request in another region. ADR-0004 states that the team does not guarantee every request is processed entirely in Singapore.
@@ -130,7 +130,7 @@ The team **did not enable Bedrock Guardrails** within the project scope (decisio
 
 ![News question](/images/5-Workshop/5.5-chat-forecast-news2.png)
 
-*Asking "Có tin gì mới của Fed không?" (any new Fed news?): there is no labelled Fed news about gold in the 7 days 17/11–24/11/2026, so the chatbot says it found none instead of making one up.*
+*Asking "Có tin gì mới của Fed không?" (any new Fed news?): the chatbot replied that it found no Fed news in the 7 days 17/11–24/11/2026, although the labelled set contains the FOMC minutes published on 18/11 (impact 2). This is a missed result, listed under "Known limitations".*
 
 ![Refusing advice](/images/5-Workshop/5.5-chat-refuse-advice.png)
 
@@ -145,3 +145,4 @@ The issues below were found when the team tried the chatbot on Production after 
 - **News dates off by one day:** the answer uses the UTC date of the release (for example, FOMC minutes published on 18/11), while the Source card on the web converts to Vietnam time (19/11).
 - **Reading the interval:** some answers call q10/q90 the "maximum fall/maximum rise", when they are only the bounds of the 80% interval.
 - **Adding generic commentary** that is not in the news, such as "high interest rates make gold less attractive because the opportunity cost rises".
+- **Missing news that exists:** a question that names no asset, such as "Có tin gì mới của Fed không?" (any new Fed news?), sometimes gets a "found nothing" answer, although the FOMC minutes of 18/11 fall inside the 7-day window and have impact 2. When the asset and date range are given, the chatbot returned this release correctly (tested on 23–24/11).
