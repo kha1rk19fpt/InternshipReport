@@ -84,17 +84,6 @@ Hệ thống chạy theo lịch: thu thập hằng ngày, dự đoán theo lô r
 - **Hằng tuần:** huấn luyện mô hình challenger, backtest trên các tuần gần nhất và chỉ thay champion khi challenger tốt hơn.
 - **Khi người dùng hỏi:** chatbot gọi tool để lấy dự đoán, độ chính xác và tin tức liên quan, rồi trả lời kèm trích nguồn.
 
-### Đánh giá theo AWS Well-Architected
-
-| Trụ cột | Vấn đề cần giải quyết | Giải pháp trong CPAWS |
-|---|---|---|
-| **Operational Excellence** | Vận hành hằng ngày không cần thao tác tay, dễ phát hiện lỗi, thay đổi có kiểm soát | Hạ tầng viết bằng AWS CDK; CI chạy test (pytest, ruff, test hạ tầng) trên mỗi Pull Request; mọi thay đổi cần review, thay đổi IAM/hạ tầng cần người phụ trách bảo mật duyệt; CloudWatch Logs và Alarm cho Lambda; quyết định kiến trúc ghi bằng ADR; image tag theo commit SHA để truy vết |
-| **Security** | Bảo vệ dữ liệu và API key, chống lạm dụng API, chống prompt injection | IAM user trong group, đăng nhập phiên ngắn hạn, không có access key dài hạn; mỗi Lambda một IAM role quyền tối thiểu; API key lưu trong SSM Parameter Store (SecureString); API Gateway dùng Cognito authorizer, không cho tự đăng ký; tin tức được đánh dấu là dữ liệu không tin cậy trong prompt, Guardrails giới hạn phạm vi chatbot; repo public không chứa key hay Account ID đầy đủ |
-| **Reliability** | Một nguồn dữ liệu lỗi hay thiếu phiên không được làm sai toàn hệ thống | Tách ingest và predict, nối bằng Lambda Destinations cho cả OnSuccess và OnFailure; tài sản lỗi được bỏ qua, các tài sản còn lại vẫn dự đoán; predict không lùi về ngày cũ khi thiếu phiên mới nhất; ingest tải lại 5 phiên gần nhất và ghi đè theo khóa nên chạy lại an toàn; S3 là bản dữ liệu chính, có thể dựng lại bảng DynamoDB từ S3 |
-| **Performance Efficiency** | Trả kết quả nhanh cho web và chatbot với chi phí thấp | Dự đoán tính sẵn theo lô; DynamoDB thiết kế theo truy vấn (PK `asset`, SK `base_date`), đọc bản mới nhất bằng một `Query` với `Limit=1`; suy luận bằng NumPy trong Lambda container thay vì PyTorch; dịch vụ serverless tự mở rộng theo lượng truy cập |
-| **Cost Optimization** | Chạy cả dự án trong khoảng 200 USD credit | Không có endpoint 24/7, NAT Gateway hay OpenSearch Serverless; DynamoDB on-demand; định tuyến chatbot sang model nhỏ cho câu đơn giản và giới hạn `max_tokens`; Training Job theo lịch, tự tắt; AWS Budgets cảnh báo ở 50 USD/tháng; ước tính chi phí trước khi thêm tài nguyên |
-| **Sustainability** | (không chấm) | Chỉ chạy tài nguyên khi cần; region gần người dùng |
-
 ---
 
 ## 4. Triển khai Kỹ thuật
