@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-# Báo Cáo Tóm Tắt: "AWS Cloud and AI Day Hanoi – Watch Party: Ho Chi Minh City"
+# Sự kiện: "AWS Cloud and AI Day Hanoi – Watch Party: Ho Chi Minh City"
 
 ### Tổng Quan Sự Kiện
 
