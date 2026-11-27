@@ -128,7 +128,7 @@ Tín hiệu ngoài giá gồm chỉ số rủi ro địa chính trị (GPR), ch�
 
 - **Ngôn ngữ và thư viện:** Python (pandas, NumPy, PyTorch cho huấn luyện, NumPy cho suy luận), React + TypeScript + Vite cho web.
 - **Hạ tầng:** AWS CDK (Python), region ap-southeast-1.
-- **Quy trình:** GitHub, mỗi việc một nhánh, Pull Request cần ít nhất 1 approval và CI xanh; thay đổi IAM/hạ tầng cần thành viên phụ trách bảo mật review.
+- **Quy trình:** Làm việc và lưu trữ code và báo cáo trên GitHub; thay đổi IAM/hạ tầng hoặc chatbot hoặc mô hình dự đoán cần thành viên phụ trách từng phần review.
 
 ---
 
