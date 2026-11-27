@@ -34,4 +34,4 @@ pre: " <b> 4.1. </b> "
 
 ![Tại buổi Buildrathon Kickoff](/images/4-Event/buildrathon1.jpg)
 
-![Ảnh tự chụp tại buổi Buildrathon Kickoff](/images/4-Event/buildrathon3.jpg)
+![Ảnh tự chụp tại buổi Buildrathon Kickoff](/images/4-Event/buildrathon3.jpg?width=360px)
