@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 4. </b> "
 ---
 
-Trong thời gian thực tập, tôi đã tham gia năm sự kiện cùng AWS và cộng đồng AWS FCAJ HCM: bốn sự kiện chuyên môn và một hoạt động thiện nguyện. Ở các sự kiện chuyên môn, tôi chủ yếu tham dự với vai trò người nghe, theo dõi và ghi chép để học hỏi; ở hoạt động thiện nguyện, tôi trực tiếp tham gia làm thú nhồi bông cùng mọi người.
+Trong thời gian thực tập, tôi đã tham gia năm sự kiện cùng AWS và cộng đồng AWS FCAJ HCM: bốn sự kiện chuyên môn và một hoạt động thiện nguyện.
 
 ---
 
@@ -19,7 +19,7 @@ Trong thời gian thực tập, tôi đã tham gia năm sự kiện cùng AWS v�
 &emsp;**Hình Thức:** Buổi kickoff nửa ngày: giới thiệu, talkshow, hỏi đáp và một thử thách thực hành ngắn  
 
 &emsp;**Nội Dung:** Khởi động cuộc thi Buildathon tổ chức cùng CMC Global: giới thiệu thử thách và tiêu chí chấm, tổng quan AWS Cloud, generative AI và AI agent, talkshow về nghề nghiệp và một thử thách thực hành AI Agent ngắn.  
-&emsp;**Kết Quả:** Có bản đồ ban đầu về các thành phần của một ứng dụng generative AI trên AWS (prompt, RAG, knowledge base, agent), ngay trước khi nhóm CPAWS bổ sung chatbot trên Bedrock.
+&emsp;**Kết Quả:** Có bản đồ ban đầu về các thành phần của một ứng dụng generative AI trên AWS (prompt, RAG, knowledge base, agent).
 
 ---
 
@@ -45,7 +45,7 @@ Trong thời gian thực tập, tôi đã tham gia năm sự kiện cùng AWS v�
 &emsp;**Hình Thức:** Buổi chia sẻ và trò chuyện trực tiếp  
 
 &emsp;**Nội Dung:** Buổi chia sẻ về văn hóa "builder" của Amazon, cách thiết kế hệ thống đơn giản, bền vững và tiết kiệm chi phí, vai trò của AI trong công việc của kỹ sư phần mềm và lời khuyên cho sinh viên mới vào nghề.  
-&emsp;**Kết Quả:** Tôi rút ra bài học "chi phí là một yêu cầu thiết kế", từ đó cùng nhóm chọn kiến trúc dự đoán theo lô, không dùng tài nguyên chạy 24/7.
+&emsp;**Kết Quả:** Tôi rút ra bài học "chi phí là một yêu cầu thiết kế", và ứng dụng trên dự án của nhóm là CPAWS
 
 ---
 
@@ -57,8 +57,8 @@ Trong thời gian thực tập, tôi đã tham gia năm sự kiện cùng AWS v�
 &emsp;**Vai Trò:** Tình nguyện viên  
 &emsp;**Hình Thức:** Hoạt động thiện nguyện  
 
-&emsp;**Nội Dung:** Các tình nguyện viên cùng nhau nhồi bông, khâu và hoàn thiện thú nhồi bông, đóng gói kèm thẻ học STEM để gửi tặng các em nhỏ, khuyến khích các em tò mò với khoa học và công nghệ.  
-&emsp;**Kết Quả:** Một trải nghiệm ý nghĩa ngoài chuyên môn, giúp tôi thấy công nghệ và cộng đồng gắn với nhau, đồng thời rèn tinh thần làm việc nhóm với những người mới gặp.
+&emsp;**Nội Dung:** Các tình nguyện viên cùng nhau nhồi bông, khâu và hoàn thiện thú nhồi bông, đóng gói kèm kit STEM để gửi tặng các em nhỏ, khuyến khích các em tò mò với khoa học và công nghệ.  
+&emsp;**Kết Quả:** Một trải nghiệm ý nghĩa ngoài chuyên môn, giúp tôi thấy công nghệ và cộng đồng gắn với nhau.
 
 ---
 
