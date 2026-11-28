@@ -16,9 +16,9 @@ Chatbot giúp người dùng đọc dự báo bằng tiếng Việt: hỏi về 
 #### Luồng `POST /chat`
 
 1. API Gateway kiểm tra ID token bằng Cognito authorizer. Người dùng được xác định bằng claim `sub`, không dùng email.
-2. Lambda `cpaws-dev-chat-api` (Python 3.12, 512 MB, timeout 28 giây) kiểm tra request: câu hỏi dài 1–500 ký tự, lịch sử hội thoại tối đa 6 lượt do client gửi lên. Server không lưu hội thoại.
+2. Lambda `cpaws-dev-chat-api` (Python 3.12, 512 MB, timeout 28 giây) kiểm tra request: câu hỏi dài 1–500 ký tự, lịch sử hội thoại tối đa 6 tin nhắn (3 cặp hỏi–đáp) do client gửi lên. Server không lưu hội thoại.
 3. **Kiểm tra hạn thời gian.** Lambda tính hạn chót từ thời điểm API Gateway nhận request (29 giây trừ 4 giây dự phòng). Nếu không còn đủ thời gian cho một lần gọi model thì trả `504` trước khi tính lượt.
-4. **Tính lượt hỏi** bằng một lần ghi DynamoDB có điều kiện vào bảng `chat-usage`. Giới hạn là 20 lượt/người/ngày và 100 lượt/ngày cho cả hệ thống; hết lượt thì trả `429`. Bộ đếm làm mới lúc 00:00 giờ Việt Nam, và web hiện số lượt còn lại dưới ô nhập. Bảng chỉ lưu bộ đếm, không lưu câu hỏi.
+4. **Tính lượt hỏi** bằng một giao dịch DynamoDB (`TransactWriteItems`) gồm hai lệnh cập nhật có điều kiện trên bảng `chat-usage`. Giới hạn là 20 lượt/người/ngày và 100 lượt/ngày cho cả hệ thống; hết lượt thì trả `429`. Bộ đếm làm mới lúc 00:00 giờ Việt Nam, và web hiện số lượt còn lại dưới ô nhập. Bảng chỉ lưu bộ đếm, không lưu câu hỏi.
 5. **Gọi Bedrock Converse** với system prompt `chatbot-haiku-v2`, hai tool, tối đa 3 vòng gọi tool. Từ bản `v1.0.1`, Lambda gửi thêm một khối `system` thứ hai ghi ngày giờ hiện tại theo giờ Việt Nam (UTC+7).
 6. **Trả kết quả:**
    - câu trả lời dạng văn bản thuần;
@@ -47,7 +47,7 @@ Tới bản `v1.0.0`, model không biết hôm nay là ngày nào. Khi hỏi th�
 Thiết kế ban đầu (ADR-0004) chia câu hỏi làm hai nhánh. Câu đơn giản (chào hỏi, khái niệm) đi **Amazon Nova 2 Lite** để tiết kiệm. Câu cần số liệu đi **Claude Haiku 4.5** có tool. Router chọn nhánh theo luật, không gọi LLM. Router được thử như sau:
 
 - 9 luật được **khóa trước** khi đo.
-- Bộ 30 câu giữ riêng do người khác soạn; người viết luật không được xem trước.
+- Bộ 30 câu giữ riêng do Khải phụ trách, giữ ngoài repo; người viết luật không thấy trước khi khóa luật.
 - Ngưỡng chốt trước: độ chính xác ≥ 90%, tối đa 1 câu cần Haiku bị đưa nhầm sang Nova.
 - Chạy đúng một lần.
 
@@ -84,7 +84,7 @@ TOOLS = [{"toolSpec": {
 
 def ask(question: str, model_id: str, system_prompt: str, run_tool) -> str:
     messages = [{"role": "user", "content": [{"text": question}]}]
-    for _ in range(3):  # tối đa 3 vòng gọi tool
+    for round_ in range(4):  # tối đa 3 vòng gọi tool + 1 lần trả lời
         resp = bedrock.converse(
             modelId=model_id, system=[{"text": system_prompt}], messages=messages,
             toolConfig={"tools": TOOLS},
@@ -94,12 +94,14 @@ def ask(question: str, model_id: str, system_prompt: str, run_tool) -> str:
         messages.append(msg)
         if resp["stopReason"] != "tool_use":
             return "".join(b.get("text", "") for b in msg["content"])
+        if round_ == 3:
+            break
         # chạy từng tool model yêu cầu, gửi kết quả lại bằng toolResult
         results = [{"toolResult": {"toolUseId": b["toolUse"]["toolUseId"],
                                    "content": [{"json": run_tool(b["toolUse"]["name"], b["toolUse"]["input"])}]}}
                    for b in msg["content"] if "toolUse" in b]
         messages.append({"role": "user", "content": results})
-    return "Mình chưa trả lời được câu này, bạn thử hỏi ngắn gọn hơn nhé."
+    return "Mình chưa trả lời được câu này, bạn thử hỏi cụ thể hơn nhé."
 ```
 
 #### Lớp bảo vệ phía server
@@ -138,7 +140,7 @@ Nhóm **không bật Bedrock Guardrails** trong phạm vi đồ án (quyết đ�
 
 #### Hạn chế đã biết
 
-Các lỗi dưới đây gặp khi nhóm hỏi thử trên Production sau bản `v1.0.1`. Sau ngày đóng băng tính năng 22/11/2026, nhóm không sửa prompt hay code mà ghi lại ở đây và trong `docs/defense/chatbot.md` (mục 8); hướng sửa được gom ở issue #84 để làm sau đồ án.
+Các lỗi dưới đây gặp khi nhóm hỏi thử trên Production sau bản `v1.0.1`. Sau ngày đóng băng tính năng 22/11/2026, nhóm không sửa prompt hay code mà ghi lại ở đây (năm lỗi đầu cũng có trong `docs/defense/chatbot.md`, mục 8); hướng sửa được gom ở issue #84 để làm sau đồ án.
 
 - **Không trả lời được câu hỏi về biến động đã qua**, ví dụ "vì sao giá vàng giảm từ 9/11 đến 20/11". Chatbot chưa có tool lịch sử giá, nên chuyển sang nói về dự báo các phiên tới và có lúc nêu một tin Fed như thể đó là nguyên nhân của mức giảm.
 - **Gọi tên xu hướng khi xác suất tăng quanh 50%:** với xác suất tăng 47–51%, chatbot có lúc viết "xu hướng giảm", trong khi nên nói là chưa rõ xu hướng. Web chỉ gắn nhãn hướng khi xác suất tăng từ 60% trở lên hoặc từ 40% trở xuống.

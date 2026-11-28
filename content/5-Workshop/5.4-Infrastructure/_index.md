@@ -15,7 +15,7 @@ The infrastructure is written in **AWS CDK (Python)** under `infra/` and split i
 
 #### Deployment order
 
-When a change touches several stacks, deploy in this order: `CpawsServing` (tables) → `CpawsData` (Lambda, Scheduler) → `CpawsOps` (alarms) → `CpawsApi` (routes). A resource must exist before anything that reads it. `CpawsAuth` is deployed once, before `CpawsApi`.
+When a change touches several stacks, deploy in this order: `CpawsServing` (tables) → `CpawsData` (Lambda, Scheduler) → `CpawsOps` (alarms) → `CpawsApi` (routes). A resource must exist before anything that reads it. `CpawsAuth` is deployed before `CpawsApi` and redeployed only when the User Pool settings change (e.g. toggling self sign-up).
 
 #### `-c` parameters are not remembered
 

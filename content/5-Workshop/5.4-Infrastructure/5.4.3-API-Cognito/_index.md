@@ -11,7 +11,7 @@ REST API stage `dev`, defined in `infra/stacks/cpaws_api_stack.py`. The detailed
 
 | Endpoint | Lambda | Description |
 |---|---|---|
-| `GET /health` | — | API health check, no sign-in required |
+| `GET /health` | `forecasts-api` | API health check, no sign-in required |
 | `GET /forecasts` | `forecasts-api` | Latest forecast for all 4 assets |
 | `GET /forecasts/{asset}` | `forecasts-api` | Latest forecast for one asset (`gold`, `silver`, `brent`, `wti`); add `?history=N` (N = 1–520) to get the closing prices of the last N sessions |
 | `GET /accuracy/{asset}` | `accuracy-api` | `rolling_8w` reliability, read-only access to table `cpaws-dev-accuracy` |
@@ -20,7 +20,7 @@ REST API stage `dev`, defined in `infra/stacks/cpaws_api_stack.py`. The detailed
 - **Authentication:** every route except `/health` uses a **Cognito authorizer**. The client sends the ID token in the `Authorization` header.
 - **Throttling** at stage level: 10 requests/second, burst 20.
 - **CORS** allows **one** origin, passed with `-c allowed_origin`. The value is used in three places: the `OPTIONS` preflight, the headers returned by the Lambdas, and the `GatewayResponse` for 4xx/5xx errors (so the browser can still read 401, 429 and 504 codes).
-- **Each Lambda only has rights on the tables it needs:** `forecasts-api` has `dynamodb:Query` on the `forecasts` table and `s3:GetObject` on the `serving/price-history/*` prefix; `accuracy-api` has `dynamodb:GetItem` and `dynamodb:Query` on the `accuracy` table; `chat-api` reads `forecasts` and `news-labels` and updates the counter in the `chat-usage` table (details in section 5.5).
+- **Each Lambda only has rights on the tables it needs:** `forecasts-api` has `dynamodb:Query` on the `forecasts` table and `s3:GetObject` on the `serving/price-history/*` prefix; `accuracy-api` has `dynamodb:GetItem` and `dynamodb:Query` on the `accuracy` table; `chat-api` reads `forecasts` and `news-labels` (news is currently read from JSON files bundled in the Lambda) and updates the counter in the `chat-usage` table (details in section 5.5).
 
 #### Two-year price history (`?history=`)
 

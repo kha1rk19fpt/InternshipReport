@@ -5,6 +5,16 @@ weight: 1
 chapter: false
 pre: " <b> 5.1. </b> "
 ---
+#### Thành viên nhóm
+
+| Họ tên | MSSV | Email |
+|---|---|---|
+| Trịnh Tiến Khải | SE196461 | khaitrinh2005@gmail.com |
+| Nguyễn Tiến Long | SE200961 | longtow41@gmail.com |
+| Châu Trần Mạnh Tiến | SE201413 | chautranmanhtien@gmail.com |
+| Huỳnh Ngọc Tuấn | SE196586 | hngtuan2kar5@gmail.com |
+| Phan Tấn Phước | SE201023 | phanphuoc9113@gmail.com |
+
 #### Bài toán
 
 Giá vàng, bạc và dầu thô biến động mạnh khi có sự kiện lớn. Người dùng phổ thông gặp ba khó khăn:
@@ -35,7 +45,7 @@ Hệ thống gồm ba luồng:
 
 1. **Thu thập và dự báo hằng ngày** (19:15 giờ Việt Nam, thứ Ba–thứ Bảy). EventBridge Scheduler gọi Lambda `ingest` tải giá và ghi snapshot lên S3. Khi ingest kết thúc, dù thành công hay lỗi, Lambda Destinations gọi Lambda `predict`. Predict tính dự báo cho từng tài sản và ghi vào DynamoDB `cpaws-dev-forecasts`. Mỗi bản đã phát hành được ghi đúng một lần, không bị ghi đè.
 2. **Đo độ tin cậy** (20:45 giờ Việt Nam). Lambda `accuracy-job` so dự báo cũ với giá thật đã biết, rồi ghi kết quả vào bảng `cpaws-dev-accuracy`.
-3. **Phục vụ người dùng.** Web React trên Amplify Hosting đăng nhập bằng Cognito, gọi REST API (API Gateway + Cognito authorizer) để lấy dự báo (`/forecasts`), độ tin cậy (`/accuracy`) và hỏi chatbot (`/chat`). Lambda chat gọi Claude Haiku 4.5 trên Bedrock với hai tool `get_forecast` và `get_news`.
+3. **Phục vụ người dùng.** Web React trên Amplify Hosting đăng nhập bằng Cognito, gọi REST API (API Gateway + Cognito authorizer) để lấy dự báo (`/forecasts`), độ tin cậy (`/accuracy/{asset}`) và hỏi chatbot (`/chat`). Lambda chat gọi Claude Haiku 4.5 trên Bedrock với hai tool `get_forecast` và `get_news`.
 
 Các phần vận hành chạy song song với ba luồng trên:
 - CloudWatch Logs, metric filter và 6 alarm gửi email qua Amazon SNS;
@@ -53,7 +63,7 @@ Các phần vận hành chạy song song với ba luồng trên:
 | `CpawsApi` | REST API stage `dev`; Lambda `forecasts-api`, `accuracy-api`, `chat-api` |
 | `CpawsOps` | SNS topic cảnh báo, 6 CloudWatch alarm |
 
-Amplify Hosting, tham số SSM chứa API key và AWS Budgets được tạo ngoài CDK (xem [5.4](../5.4-infrastructure/)).
+Amplify Hosting, tham số SSM chứa API key và AWS Budgets được tạo ngoài CDK (xem [5.2](../5.2-prerequiste/) và [5.4.3](../5.4-infrastructure/5.4.3-api-cognito/)).
 
 #### So với bản đề xuất
 

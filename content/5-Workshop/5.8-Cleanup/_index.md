@@ -22,7 +22,7 @@ The CPAWS team keeps the system running until final grading is over, and cleans 
 #### Prepare and stop new work
 
 1. **Confirm the scope and back up.** Check the account (compare only the last 4 digits), the Region and the stack names. Save what must be kept for reference: evaluation results, model artifacts, screenshots and cost figures.
-2. **Disable the two EventBridge Scheduler schedules** (`cpaws-dev-ingest-daily`, `cpaws-dev-accuracy-daily`) before deleting any stack, then wait for running Lambda invocations to finish. This stops new work and avoids an ingest run in the middle of the deletion.
+2. **Disable the two EventBridge Scheduler schedules** (`cpaws-dev-ingest-daily`, `cpaws-dev-accuracy-daily`) before deleting any stack (Console: Amazon EventBridge > Scheduler > Schedules > select the schedule > **Disable**), then wait for running Lambda invocations to finish. This stops new work and avoids an ingest run in the middle of the deletion.
 
 ```bash
 aws sts get-caller-identity --profile cpaws-dev
@@ -56,7 +56,7 @@ Some resources are kept when their stack is deleted, to avoid losing data by mis
 | S3 `cpaws-dev-lake` | The bucket is versioned, so every object version must be deleted before the bucket can be (Console: **Empty**, then **Delete**). Before that, an administrator must remove the explicit deny statements that block deletion under `eval/` |
 | DynamoDB `cpaws-dev-forecasts`, `cpaws-dev-news-labels`, `cpaws-dev-accuracy` | `aws dynamodb delete-table --table-name <TABLE_NAME> --profile cpaws-dev` |
 | Cognito User Pool `cpaws-dev-users` | `aws cognito-idp delete-user-pool --user-pool-id <USER_POOL_ID> --profile cpaws-dev` |
-| Log groups of the API Lambdas | Delete in CloudWatch > Log Management once the logs are no longer needed |
+| All remaining project log groups (3 API log groups with `RETAIN`, the older log group created outside CDK, any created by custom resources) | Find them with `aws logs describe-log-groups --log-group-name-pattern cpaws --profile cpaws-dev`, then delete with `aws logs delete-log-group --log-group-name <NAME> --profile cpaws-dev` once the logs are no longer needed |
 
 `aws s3 rb --force` does not remove old versions and delete markers in a versioned bucket, so use **Empty** in the Console. If an explicit deny or Object Lock blocks deletion, stop and contact the data owner; do not remove the protection just to finish faster.
 
@@ -67,6 +67,7 @@ aws ssm delete-parameter --name /cpaws/dev/eia-api-key --profile cpaws-dev
 ```
 
 - Delete app `cpaws-dev-web` in the Amplify Console.
+- Delete the `DRAFT` guardrail (Bedrock Console > Guardrails) and the Cost Anomaly Detection monitor; remove the project IAM users/groups and deny policies if the account is no longer used.
 - Keep the CDK bootstrap bucket, repository and parameter, and the AWS managed KMS keys, if the account is shared.
 - Keep AWS Budgets for a few more days to see whether any cost is still incurred, then delete it.
 

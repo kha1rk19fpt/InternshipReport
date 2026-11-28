@@ -11,7 +11,7 @@ REST API stage `dev`, định nghĩa trong `infra/stacks/cpaws_api_stack.py`. H�
 
 | Endpoint | Lambda | Mô tả |
 |---|---|---|
-| `GET /health` | — | Kiểm tra API, không cần đăng nhập |
+| `GET /health` | `forecasts-api` | Kiểm tra API, không cần đăng nhập |
 | `GET /forecasts` | `forecasts-api` | Dự báo mới nhất của cả 4 tài sản |
 | `GET /forecasts/{asset}` | `forecasts-api` | Dự báo mới nhất của một tài sản (`gold`, `silver`, `brent`, `wti`); thêm `?history=N` (N = 1–520) để lấy giá cuối phiên của N phiên gần nhất |
 | `GET /accuracy/{asset}` | `accuracy-api` | Độ tin cậy `rolling_8w`, chỉ đọc bảng `cpaws-dev-accuracy` |
@@ -20,7 +20,7 @@ REST API stage `dev`, định nghĩa trong `infra/stacks/cpaws_api_stack.py`. H�
 - **Xác thực:** mọi route trừ `/health` dùng **Cognito authorizer**. Client gửi ID token trong header `Authorization`.
 - **Throttling** ở mức stage: 10 request/giây, burst 20.
 - **CORS** chỉ cho phép **một** origin, truyền bằng `-c allowed_origin`. Giá trị này được dùng ở ba chỗ: preflight `OPTIONS`, header do Lambda trả về, và `GatewayResponse` cho lỗi 4xx/5xx (để trình duyệt vẫn đọc được mã 401, 429, 504).
-- **Mỗi Lambda chỉ có quyền trên đúng bảng mình cần:** `forecasts-api` được `dynamodb:Query` trên bảng `forecasts` và `s3:GetObject` trên đúng prefix `serving/price-history/*`; `accuracy-api` được `dynamodb:GetItem`, `dynamodb:Query` trên bảng `accuracy`; `chat-api` được đọc `forecasts`, `news-labels` và cập nhật bộ đếm trong bảng `chat-usage` (chi tiết ở mục 5.5).
+- **Mỗi Lambda chỉ có quyền trên đúng bảng mình cần:** `forecasts-api` được `dynamodb:Query` trên bảng `forecasts` và `s3:GetObject` trên đúng prefix `serving/price-history/*`; `accuracy-api` được `dynamodb:GetItem`, `dynamodb:Query` trên bảng `accuracy`; `chat-api` được đọc `forecasts`, `news-labels` (hiện tin được đọc từ file JSON đóng gói trong Lambda) và cập nhật bộ đếm trong bảng `chat-usage` (chi tiết ở mục 5.5).
 
 #### Lịch sử giá 2 năm (`?history=`)
 
@@ -96,6 +96,7 @@ Web viết bằng React + TypeScript + Vite trong thư mục `web/`. Các biến
 | Biến | Ý nghĩa |
 |---|---|
 | `VITE_API_URL` | URL của API (để trống thì web chạy bằng dữ liệu mẫu) |
+| `VITE_USE_SAMPLE` | Đặt `false` khi build bản thật (file mẫu để `true`); để `true` hoặc để trống `VITE_API_URL` thì web chạy bằng dữ liệu mẫu |
 | `VITE_AUTH_ENABLED`, `VITE_REGION`, `VITE_USER_POOL_ID`, `VITE_USER_POOL_CLIENT_ID` | Đăng nhập Cognito. ID của User Pool và app client là giá trị công khai của SPA, không phải bí mật |
 | `VITE_SHOW_METAL_PRICES` | Hiện giá vàng/bạc quy đổi từ GLD/SLV, kèm dòng ghi nguồn |
 | `VITE_ACCURACY_API` | Hiện khối "Độ tin cậy" từ `/accuracy/{asset}` |

@@ -44,7 +44,7 @@ Source: Lambda/CloudWatch, Nov 17–23. x86_64, 512 MB ephemeral storage. Comput
 | chat-api | 512 | 4596 | 6 | 4.652 | 300 | 697.800 |
 | **Total** | | | | | **2766** | **2817.156** |
 
-Predict billed-duration logs average approximately 5.393 seconds; the estimate uses 5.392 seconds. Runtime is not necessarily billed duration. Additional retries and variable cold starts are excluded. Source sets Scheduler retries to zero and ingest Lambda asynchronous retries to one; the live Console displayed a dash for retry policy, so that field did not verify the source setting. One successful execution per scheduled task is assumed.
+Predict billed-duration logs average approximately 5.393 seconds; the estimate uses 5.392 seconds. Runtime is not necessarily billed duration. Additional retries and variable cold starts are excluded. Source sets Scheduler retries to zero and ingest Lambda asynchronous retries to one; the live Console displayed a dash for retry policy, so that field did not verify the source setting. One successful execution per scheduled task is assumed. There are two Scheduler schedules, not three: predict runs as a Lambda Destination.
 
 ##### 1.3. Storage, requests and network traffic
 
@@ -88,7 +88,7 @@ The Calculator's 1800 equivalent requests encode the token volume, not expected 
 
 ##### 1.5. EventBridge Scheduler
 
-Both schedules are enabled Tuesday–Saturday; `InvocationAttemptCount` for group `default` totaled 23 during Nov 1–23. The accuracy schedule was created Nov 11, so the current schedule rather than a direct extrapolation gives 44 invocations/month. The exported Public estimate shows 44 invocations, 1 KB payload and $0.00 after the 14 million monthly invocation allowance. The gross reference charge is $0.000044 at $1 per million, before allowance. Extra retries are excluded.
+Both schedules (`cpaws-dev-ingest-daily`, `cpaws-dev-accuracy-daily`) are enabled Tuesday–Saturday; `InvocationAttemptCount` for group `default` totaled 23 during Nov 1–23. The accuracy schedule was created Nov 11, so the current schedule rather than a direct extrapolation gives 44 invocations/month. The exported Public estimate shows 44 invocations, 1 KB payload and $0.00 after the 14 million monthly invocation allowance. The gross reference charge is $0.000044 at $1 per million, before allowance. Extra retries are excluded.
 
 #### 2. All 34 estimate lines
 

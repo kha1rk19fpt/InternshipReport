@@ -53,11 +53,11 @@ docker buildx build --platform linux/amd64 --provenance=false \
 Lambda container chỉ tạo được khi image đã có trong ECR. Nhóm deploy theo từng bước:
 
 1. Tạo bucket và repo ECR trước.
-2. Push image ingest, rồi thêm Lambda ingest.
+2. Push image ingest, rồi thêm Lambda ingest. Code hiện tại không có cờ tách riêng cho ingest; trên tài khoản mới cần có sẵn image ingest trong repo `cpaws-dev-ingest` trước khi deploy `CpawsData`.
 3. Với predict, stack có cờ `-c predict_repo_only=true`. Lần deploy đầu bật cờ này để chỉ tạo repo. Sau khi push image predict thì deploy lại **không** có cờ.
 
 {{% notice warning %}}
-Đừng dùng `predict_repo_only=true` ở các lần deploy sau: lần deploy đó sẽ xóa Lambda predict và destination của ingest.
+Đừng dùng `predict_repo_only=true` ở các lần deploy sau: lần deploy đó sẽ xóa Lambda predict, destination của ingest, Lambda `accuracy-job` và lịch accuracy.
 {{% /notice %}}
 
 Các lần deploy thường lệ:

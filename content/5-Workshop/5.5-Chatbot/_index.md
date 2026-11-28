@@ -16,9 +16,9 @@ The chatbot helps users read the forecasts in Vietnamese: questions about gold, 
 #### The `POST /chat` flow
 
 1. API Gateway checks the ID token with the Cognito authorizer. The user is identified by the `sub` claim, not by email.
-2. Lambda `cpaws-dev-chat-api` (Python 3.12, 512 MB, 28-second timeout) validates the request: a question of 1–500 characters and at most 6 turns of history sent by the client. The server does not store conversations.
+2. Lambda `cpaws-dev-chat-api` (Python 3.12, 512 MB, 28-second timeout) validates the request: a question of 1–500 characters and at most 6 messages (3 exchanges) of history sent by the client. The server does not store conversations.
 3. **Deadline check.** The Lambda computes a deadline from the time API Gateway received the request (29 seconds minus 4 seconds of margin). If there is not enough time left for one model call, it returns `504` before counting the question.
-4. **Count the question** with one conditional DynamoDB write to table `chat-usage`. The limits are 20 questions per user per day and 100 per day for the whole system; beyond that it returns `429`. The counters reset at 00:00 Vietnam time, and the web app shows the remaining questions below the input box. The table only stores counters, never questions.
+4. **Count the question** with one DynamoDB transaction (`TransactWriteItems`) of two conditional updates on table `chat-usage`. The limits are 20 questions per user per day and 100 per day for the whole system; beyond that it returns `429`. The counters reset at 00:00 Vietnam time, and the web app shows the remaining questions below the input box. The table only stores counters, never questions.
 5. **Call Bedrock Converse** with system prompt `chatbot-haiku-v2`, two tools, and at most 3 tool rounds. Since `v1.0.1`, the Lambda also sends a second `system` block with the current date and time in Vietnam time (UTC+7).
 6. **Return the result:**
    - the answer as plain text;
@@ -47,7 +47,7 @@ Up to `v1.0.0`, the model did not know the current date. In a test on 23/11/2026
 The original design (ADR-0004) split questions into two branches. Simple questions (greetings, concepts) would go to **Amazon Nova 2 Lite** to save cost. Questions needing data would go to **Claude Haiku 4.5** with tools. The router chooses a branch by rules, without calling an LLM. It was tested as follows:
 
 - 9 rules were **locked before** measuring.
-- A held-out set of 30 questions was written by someone else; the rule author did not see it beforehand.
+- A held-out set of 30 questions owned by Khải, kept outside the repository; the rule author did not see it before the rules were locked.
 - Thresholds fixed in advance: accuracy ≥ 90%, and at most 1 question that needs Haiku wrongly sent to Nova.
 - It was run exactly once.
 
@@ -84,7 +84,7 @@ TOOLS = [{"toolSpec": {
 
 def ask(question: str, model_id: str, system_prompt: str, run_tool) -> str:
     messages = [{"role": "user", "content": [{"text": question}]}]
-    for _ in range(3):  # at most 3 tool rounds
+    for round_ in range(4):  # at most 3 tool rounds + 1 answer
         resp = bedrock.converse(
             modelId=model_id, system=[{"text": system_prompt}], messages=messages,
             toolConfig={"tools": TOOLS},
@@ -94,12 +94,14 @@ def ask(question: str, model_id: str, system_prompt: str, run_tool) -> str:
         messages.append(msg)
         if resp["stopReason"] != "tool_use":
             return "".join(b.get("text", "") for b in msg["content"])
+        if round_ == 3:
+            break
         # run every tool the model asked for and send the results back as toolResult
         results = [{"toolResult": {"toolUseId": b["toolUse"]["toolUseId"],
                                    "content": [{"json": run_tool(b["toolUse"]["name"], b["toolUse"]["input"])}]}}
                    for b in msg["content"] if "toolUse" in b]
         messages.append({"role": "user", "content": results})
-    return "Mình chưa trả lời được câu này, bạn thử hỏi ngắn gọn hơn nhé."
+    return "Mình chưa trả lời được câu này, bạn thử hỏi cụ thể hơn nhé."
 ```
 
 #### Server-side safeguards
@@ -138,7 +140,7 @@ The team **did not enable Bedrock Guardrails** within the project scope (decisio
 
 #### Known limitations
 
-The issues below were found when the team tried the chatbot on Production after `v1.0.1`. After the feature freeze on 22/11/2026 the team changes neither prompt nor code; the issues are recorded here and in `docs/defense/chatbot.md` (section 8), and the fixes are collected in issue #84 for after the project.
+The issues below were found when the team tried the chatbot on Production after `v1.0.1`. After the feature freeze on 22/11/2026 the team changes neither prompt nor code; the issues are recorded here (the first five are also in `docs/defense/chatbot.md`, section 8), and the fixes are collected in issue #84 for after the project.
 
 - **Cannot answer questions about past moves**, such as "why did gold fall from 9/11 to 20/11". The chatbot has no price-history tool, so it talks about the coming sessions instead and sometimes cites a Fed release as if it caused the drop.
 - **Naming a trend when the probability of a rise is near 50%:** at 47–51% the chatbot sometimes writes "downtrend", when it should say the direction is unclear. The web app only shows a direction label at 60% and above or 40% and below.

@@ -38,26 +38,26 @@ Nguồn: Lambda/CloudWatch, 17–23/11/2026. Tất cả x86_64; ephemeral storag
 
 | Function | RAM (MB) | Avg runtime quan sát (ms) | Invocations quan sát/7 ngày | Duration dự toán (s) | Lượt/tháng | GB-s/tháng |
 |---|---:|---:|---:|---:|---:|---:|
-| ingest | 1024 | 12610 | 5 | 12.610 | 22 | 277.420 |
-| predict | 1024 | 5392 | 5 | 5.392* | 22 | 118.624 |
-| accuracy-job | 1024 | 49621 | 5 | 49.621 | 22 | 1091.662 |
-| forecasts-api | 256 | 1299 | 71 | 1.299 | 1.800 | 584.550 |
-| accuracy-api | 256 | 314 | 48 | 0.314 | 600 | 47.100 |
-| chat-api | 512 | 4596 | 6 | 4.652 | 300 | 697.800 |
-| **Tổng** | | | | | **2.766** | **2817.156** |
+| ingest | 1024 | 12610 | 5 | 12,610 | 22 | 277,420 |
+| predict | 1024 | 5392 | 5 | 5,392* | 22 | 118,624 |
+| accuracy-job | 1024 | 49621 | 5 | 49,621 | 22 | 1.091,662 |
+| forecasts-api | 256 | 1299 | 71 | 1,299 | 1.800 | 584,550 |
+| accuracy-api | 256 | 314 | 48 | 0,314 | 600 | 47,100 |
+| chat-api | 512 | 4596 | 6 | 4,652 | 300 | 697,800 |
+| **Tổng** | | | | | **2.766** | **2.817,156** |
 
-*Dòng predict khớp giá trị Calculator 118.624 GB-s; trung bình billed duration từ log khoảng 5.393 s, khác nhẹ do làm tròn. Dự toán chưa tính thêm retry, cold-start khác biệt hoặc concurrency bất thường. Hai lịch Scheduler không phải ba lịch: predict là Lambda Destination. Source đặt Scheduler retry = 0 và ingest có Lambda async retry = 1; Console hiển thị retry policy `-`, nên không xác nhận live bằng trường này. Baseline giả định một lần gọi thành công cho mỗi tác vụ.
+*Dòng predict khớp giá trị Calculator 118,624 GB-s; trung bình billed duration từ log khoảng 5,393 s, khác nhẹ do làm tròn. Dự toán chưa tính thêm retry, cold-start khác biệt hoặc concurrency bất thường. Hai lịch Scheduler không phải ba lịch: predict là Lambda Destination. Source đặt Scheduler retry = 0 và ingest có Lambda async retry = 1; Console hiển thị retry policy `-`, nên không xác nhận live bằng trường này. Baseline giả định một lần gọi thành công cho mỗi tác vụ.
 
 ##### 1.3. Dung lượng lưu trữ, requests và băng thông
 
-| Hạng mục | Dữ liệu/căn cứ | Monthly assumption |
+| Hạng mục | Dữ liệu/căn cứ | Giả định/tháng |
 | --- | --- | --- |
-| S3 storage | ~89,25 MB lake + ~1,06 MB CDK assets; snapshot inventory | 0.10 GB-Mo |
+| S3 storage | ~89,25 MB lake + ~1,06 MB CDK assets; snapshot inventory | 0,10 GB-Mo |
 | S3 Tier 1 / Tier 2 | 218 / 3381 requests, 17–23/11 → ×30/7 | 934 / 14490 requests |
-| DynamoDB on-demand | 4 bảng; đầu vào Calculator đã lưu; chưa có đủ chi tiết phép đo lịch sử trong bộ hồ sơ này | 6381 RRU; 11310 WRU; 0.00158 GB-Mo |
-| Amplify storage | 0.0038870168 GB usage 01–23/11; 20 ngày app hoạt động (04–23/11) → ×30/20 | 0.006 GB |
-| Amplify outbound | 5.547.694 bytes/2 ngày (22–23/11) → 83.215.410 bytes/30 ngày | 0.084 GB |
-| ECR storage | 0.7476365831 GB-Mo/23 ngày → ×30/23; 8 image hiển thị trong 2 repo | 0.98 GB-Mo |
+| DynamoDB on-demand | 4 bảng; đầu vào Calculator đã lưu; chưa có đủ chi tiết phép đo lịch sử trong bộ hồ sơ này | 6381 RRU; 11310 WRU; 0,00158 GB-Mo |
+| Amplify storage | 0,0038870168 GB usage 01–23/11; 20 ngày app hoạt động (04–23/11) → ×30/20 | 0,006 GB |
+| Amplify outbound | 5.547.694 bytes/2 ngày (22–23/11) → 83.215.410 bytes/30 ngày | 0,084 GB |
+| ECR storage | 0,7476365831 GB-Mo/23 ngày → ×30/23; 8 image hiển thị trong 2 repo | 0,98 GB-Mo |
 | ECR outbound | 0.1287299758 GB/23 ngày → ×30/23 | 0.168 GB |
 | CloudWatch storage | 0.0000616697 GB-Mo/23 ngày; mức ngày 23/11 0.0000047902 ×30 | 0.00015 GB-Mo |
 | CloudWatch vended logs | 0.0002119546 GB/23 ngày → ×30/23 | 0.00028 GB |
@@ -85,7 +85,7 @@ Source `src/chatbot/chat.py` đặt router mặc định `complex`, sử dụng 
 | Giá Global On-Demand Standard trong Calculator | $1/1M input; $5/1M output |
 | Đầu vào Public Calculator | 1 request/min, 1 giờ/ngày, 1712 input / 76 output tokens/request |
 | Token tương đương 30 ngày | 3.081.600 input; 136.800 output |
-| **Chi phí** | **3.081600 + 0.684000 = $3.765600/tháng** |
+| **Chi phí** | **3,0816 + 0,684 = 3,7656 USD/tháng** |
 
 Public Calculator dùng 1.800 **request tương đương để biểu diễn tổng token**, không phải số call thực tế dự kiến. Chênh lệch output token do giới hạn nhập số nguyên. Mẫu 7 chat nhỏ, có 6 chat dùng tool, chưa đại diện mọi tình huống production. Nếu người dùng hỏi dài hoặc nhiều vòng tool, chi phí tăng.
 

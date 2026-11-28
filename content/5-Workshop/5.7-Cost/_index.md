@@ -49,7 +49,7 @@ Long prepared the estimate on 24/11/2026 for **one** running environment (`cpaws
 | AWS Amplify | Static web app | 0.013 |
 | Amazon S3 | Data lake | 0.013 |
 | Amazon API Gateway | REST API | 0.011 |
-| Amazon DynamoDB | Forecast, accuracy and chat-quota tables | 0.009 |
+| Amazon DynamoDB | Forecast, accuracy, chat-quota and news-label tables | 0.009 |
 | AWS KMS | Encryption API | 0.0004 |
 | Amazon SNS, EventBridge Scheduler, SSM Parameter Store | Alerts, schedules, parameters | 0 |
 | **Total** | | **5.254** |
@@ -90,7 +90,7 @@ The question limit is not a spending limit: longer questions or more tool calls 
 | Chatbot question limits and `maxTokens` 1500 | Caps unexpected Bedrock cost |
 | ECR keeps 5 images, logs kept 1 month, old S3 versions kept 30 days | Nothing accumulates forever |
 | AWS Budgets at 50 USD/month and Cost Anomaly Detection | Early warning of unusual cost |
-| `Project`, `Owner`, `Env` tags on every resource | Filter cost by project in Cost Explorer |
+| `Project`, `Owner`, `Env` tags on every CDK-managed resource | Filter cost by project in Cost Explorer |
 
 The proposals below are **not done yet**; each needs a measurement before and after the change, and no saving is claimed until it is measured:
 
@@ -107,7 +107,7 @@ The proposals below are **not done yet**; each needs a measurement before and af
 | **Operational Excellence** | Infrastructure as code (CDK, 5 stacks), `cdk diff` before deploying, CI on every PR, rollback with one deploy command using an old image tag, an ADR for every architecture decision | Manual deployment from one machine, no CD; Amplify by manual zip upload |
 | **Security** | IAM users + groups, MFA, short-lived sign-in sessions; least-privilege IAM role per Lambda; S3 public access blocked, SSL enforced; API key in SSM `SecureString`; Cognito authorizer, throttling, single-origin CORS; deletion of evaluation results blocked by explicit deny | Bedrock Guardrails not enabled; the read-only group uses `ReadOnlyAccess`, broader than needed |
 | **Reliability** | A failed source still lets the other assets publish; conditional writes make re-runs safe; versioned bucket; forecasts table and User Pool are `RETAIN`; 6 alarms send email | One region, one environment; no alert when the schedule does not run |
-| **Performance Efficiency** | Lambda container images chosen for large libraries; predict runs in about 3.3 seconds with 1,024 MB; forecasts are precomputed so the API reads one record | Chat Lambda cold starts add to answer time |
+| **Performance Efficiency** | Lambda container images chosen for large libraries; predict runs in about 3.3–5.4 seconds with 1,024 MB; forecasts are precomputed so the API reads one record | Chat Lambda cold starts add to answer time |
 | **Cost Optimization** | No resources billed by the hour; actual cost about 6.35 USD from 01/10 to 24/11/2026, estimate 5.26 USD/month; Budgets and Cost Anomaly Detection | Bedrock cost not yet broken down by feature |
 | **Sustainability** | Runs only when there is a new trading session (Tuesday–Saturday); no idle machines | — |
 

@@ -22,7 +22,7 @@ Nhóm CPAWS giữ hệ thống chạy tới hết đợt chấm cuối kỳ, sau
 #### Chuẩn bị và ngừng tải
 
 1. **Xác nhận phạm vi và sao lưu.** Kiểm tra đúng tài khoản (chỉ đối chiếu 4 số cuối), region và tên stack. Lưu lại những gì cần giữ để đối chiếu: kết quả đánh giá, artifact mô hình, ảnh và số liệu chi phí.
-2. **Tắt hai lịch EventBridge Scheduler** (`cpaws-dev-ingest-daily`, `cpaws-dev-accuracy-daily`) trước khi xóa stack, rồi chờ các lượt Lambda đang chạy kết thúc. Bước này dừng tải mới và tránh một lượt ingest chạy giữa lúc đang xóa.
+2. **Tắt hai lịch EventBridge Scheduler** (`cpaws-dev-ingest-daily`, `cpaws-dev-accuracy-daily`) trước khi xóa stack, (Console: Amazon EventBridge > Scheduler > Schedules > chọn lịch > **Disable**), rồi chờ các lượt Lambda đang chạy kết thúc. Bước này dừng tải mới và tránh một lượt ingest chạy giữa lúc đang xóa.
 
 ```bash
 aws sts get-caller-identity --profile cpaws-dev
@@ -56,7 +56,7 @@ Một số tài nguyên được giữ lại khi xóa stack, để tránh mất 
 | S3 `cpaws-dev-lake` | Bucket có versioning, nên phải xóa mọi phiên bản object rồi mới xóa được bucket (Console: **Empty**, rồi **Delete**). Trước đó, người quản trị phải gỡ các statement explicit deny chặn xóa trên `eval/` |
 | DynamoDB `cpaws-dev-forecasts`, `cpaws-dev-news-labels`, `cpaws-dev-accuracy` | `aws dynamodb delete-table --table-name <TEN_BANG> --profile cpaws-dev` |
 | Cognito User Pool `cpaws-dev-users` | `aws cognito-idp delete-user-pool --user-pool-id <USER_POOL_ID> --profile cpaws-dev` |
-| Log group của các Lambda API | Xóa trong CloudWatch > Log Management sau khi không còn cần log |
+| Mọi log group còn lại của dự án (3 log group API đặt `RETAIN`, log group cũ tạo ngoài CDK, log group do custom resource sinh ra) | Tìm bằng `aws logs describe-log-groups --log-group-name-pattern cpaws --profile cpaws-dev`, rồi xóa bằng `aws logs delete-log-group --log-group-name <TEN> --profile cpaws-dev` sau khi không còn cần log |
 
 `aws s3 rb --force` không xóa các phiên bản cũ và delete marker của bucket có versioning, nên dùng **Empty** trong Console. Gặp explicit deny hay Object Lock thì dừng lại và báo người phụ trách dữ liệu, không tự gỡ để xóa cho nhanh.
 
@@ -67,6 +67,7 @@ aws ssm delete-parameter --name /cpaws/dev/eia-api-key --profile cpaws-dev
 ```
 
 - Xóa app `cpaws-dev-web` trong Amplify Console.
+- Xóa guardrail bản `DRAFT` trong Bedrock Console > Guardrails và monitor Cost Anomaly Detection; gỡ IAM user/group và policy deny của dự án nếu không dùng tài khoản nữa.
 - Không xóa bucket, repo và tham số của CDK bootstrap hay các KMS key do AWS quản lý nếu tài khoản còn dùng chung.
 - Giữ AWS Budgets thêm vài ngày để theo dõi xem còn phát sinh chi phí không, rồi mới xóa.
 

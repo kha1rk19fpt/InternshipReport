@@ -15,7 +15,7 @@ Hạ tầng được viết bằng **AWS CDK (Python)** trong thư mục `infra/
 
 #### Thứ tự deploy
 
-Khi một thay đổi động tới nhiều stack, deploy theo thứ tự: `CpawsServing` (bảng) → `CpawsData` (Lambda, Scheduler) → `CpawsOps` (alarm) → `CpawsApi` (route). Tài nguyên phải có trước, rồi mới tới thành phần đọc nó. `CpawsAuth` chỉ cần deploy một lần, trước `CpawsApi`.
+Khi một thay đổi động tới nhiều stack, deploy theo thứ tự: `CpawsServing` (bảng) → `CpawsData` (Lambda, Scheduler) → `CpawsOps` (alarm) → `CpawsApi` (route). Tài nguyên phải có trước, rồi mới tới thành phần đọc nó. `CpawsAuth` deploy trước `CpawsApi`; chỉ deploy lại khi đổi cấu hình User Pool (ví dụ bật/tắt tự đăng ký).
 
 #### Tham số `-c` không được lưu lại
 

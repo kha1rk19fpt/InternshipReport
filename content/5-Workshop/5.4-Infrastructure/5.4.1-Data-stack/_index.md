@@ -53,11 +53,11 @@ docker buildx build --platform linux/amd64 --provenance=false \
 A container Lambda can only be created once its image exists in ECR. The team deployed in steps:
 
 1. Create the bucket and the ECR repositories first.
-2. Push the ingest image, then add the ingest Lambda.
+2. Push the ingest image, then add the ingest Lambda. The current code has no ingest-only flag; on a new account the ingest image must already be in `cpaws-dev-ingest` before deploying `CpawsData`.
 3. For predict, the stack has the flag `-c predict_repo_only=true`. The first deployment uses it to create only the repository. After the predict image is pushed, deploy again **without** the flag.
 
 {{% notice warning %}}
-Do not use `predict_repo_only=true` on later deployments: that deployment would delete the predict Lambda and the ingest destination.
+Do not use `predict_repo_only=true` on later deployments: that deployment would delete the predict Lambda, the ingest destination, the `accuracy-job` Lambda and its schedule.
 {{% /notice %}}
 
 Routine deployments:

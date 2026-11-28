@@ -49,7 +49,7 @@ Dự toán do Long lập ngày 24/11/2026 cho **một môi trường** đang ch�
 | AWS Amplify | Web tĩnh | 0,013 |
 | Amazon S3 | Data lake | 0,013 |
 | Amazon API Gateway | REST API | 0,011 |
-| Amazon DynamoDB | Bảng dự báo, độ tin cậy, quota chat | 0,009 |
+| Amazon DynamoDB | Bảng dự báo, độ tin cậy, quota chat, nhãn tin | 0,009 |
 | AWS KMS | API mã hóa | 0,0004 |
 | Amazon SNS, EventBridge Scheduler, SSM Parameter Store | Cảnh báo, lịch, tham số | 0 |
 | **Tổng** | | **5,254** |
@@ -90,7 +90,7 @@ Giới hạn lượt hỏi không phải giới hạn tiền: câu hỏi dài ho
 | Giới hạn lượt hỏi chatbot và `maxTokens` 1500 | Chặn chi phí Bedrock tăng bất thường |
 | ECR giữ 5 image, log giữ 1 tháng, phiên bản cũ trên S3 giữ 30 ngày | Không để dữ liệu tích lũy vô thời hạn |
 | AWS Budgets 50 USD/tháng và Cost Anomaly Detection | Phát hiện sớm khi chi phí tăng bất thường |
-| Tag `Project`, `Owner`, `Env` trên mọi tài nguyên | Lọc chi phí theo dự án trong Cost Explorer |
+| Tag `Project`, `Owner`, `Env` trên mọi tài nguyên do CDK tạo | Lọc chi phí theo dự án trong Cost Explorer |
 
 Các đề xuất dưới đây **chưa làm**; mỗi đề xuất cần đo trước và sau khi đổi, không ghi là đã tiết kiệm khi chưa đo:
 
@@ -107,7 +107,7 @@ Các đề xuất dưới đây **chưa làm**; mỗi đề xuất cần đo tr�
 | **Operational Excellence** | Hạ tầng dạng code (CDK, 5 stack), `cdk diff` trước khi deploy, CI ở mọi PR, rollback bằng một lệnh deploy với tag image cũ, ADR cho mọi quyết định kiến trúc | Deploy tay từ một máy, chưa có CD; Amplify upload zip tay |
 | **Security** | IAM user + group, MFA, phiên đăng nhập ngắn hạn; IAM role quyền tối thiểu cho từng Lambda; S3 chặn public, bắt buộc SSL; API key trong SSM `SecureString`; Cognito authorizer, throttling, CORS một origin; chặn xóa kết quả đánh giá bằng explicit deny | Không bật Bedrock Guardrails; group chỉ đọc đang dùng `ReadOnlyAccess` rộng hơn nhu cầu |
 | **Reliability** | Ingest lỗi một nguồn vẫn phát hành các tài sản còn lại; ghi có điều kiện nên chạy lại an toàn; bucket có versioning; bảng dự báo và User Pool `RETAIN`; 6 alarm gửi email | Một region, một môi trường; chưa có cảnh báo khi lịch không chạy |
-| **Performance Efficiency** | Chọn Lambda container vì thư viện lớn; predict chạy khoảng 3,3 giây với 1.024 MB; dự báo tính sẵn nên API chỉ đọc một bản ghi | Cold start của Lambda chat cộng vào thời gian trả lời |
+| **Performance Efficiency** | Chọn Lambda container vì thư viện lớn; predict chạy khoảng 3,3–5,4 giây với 1.024 MB; dự báo tính sẵn nên API chỉ đọc một bản ghi | Cold start của Lambda chat cộng vào thời gian trả lời |
 | **Cost Optimization** | Không có tài nguyên tính tiền theo giờ; chi phí thực tế khoảng 6,35 USD từ 01/10 tới 24/11/2026, dự toán 5,26 USD/tháng; Budgets và Cost Anomaly Detection | Chưa tách chi phí Bedrock theo tính năng |
 | **Sustainability** | Chỉ chạy khi có phiên giao dịch mới (thứ Ba–thứ Bảy); không có máy chạy không tải | — |
 
