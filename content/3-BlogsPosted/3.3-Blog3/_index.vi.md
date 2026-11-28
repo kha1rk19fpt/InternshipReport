@@ -1,122 +1,108 @@
 ---
 title: "Blog 3"
-date: 2026-11-16
+date: 2026-11-15
 weight: 3
 chapter: false
 pre: " <b> 3.3. </b> "
 ---
 
-# Thiết kế bảng DynamoDB: bắt đầu từ câu hỏi, không phải từ dữ liệu
+# Mô hình chỉ chạy vài giây mỗi ngày: Có cần đến SageMaker Endpoint không?
 
-*Trịnh Tiến Khải · Bài đăng trên nhóm AWS Study Group: [CẬP NHẬT LINK SAU KHI ĐĂNG]*
+bởi Trịnh Tiến Khải | ngày 15/11/2026 | đăng tại [AWS Study Group VN](https://www.facebook.com/groups/awsstudygroupfcj/) | [Bài gốc trên Facebook](https://www.facebook.com/groups/awsstudygroupfcj/permalink/2338607513570874/)
 
-Quen làm việc với SQL, lúc mới học Amazon DynamoDB mình thiết kế bảng theo thói quen cũ: chuẩn hóa dữ liệu, mỗi dòng một con số, cần gì thì lọc. Đọc kỹ tài liệu thì mình phát hiện DynamoDB đòi cách nghĩ ngược lại: phải biết trước ứng dụng sẽ hỏi gì rồi mới chọn khóa. Bài này ghi lại cách tiếp cận đó qua một ví dụ, kèm sơ đồ có đánh số từng luồng, và một tính năng mình thấy rất đáng biết: ghi có điều kiện.
+*Bài của thành viên nhóm Trịnh Tiến Khải. Nội dung dưới đây giữ đúng câu chữ của bài đã đăng, chỉ trình bày lại bằng markdown và ghi đầy đủ đường dẫn của tài liệu tham khảo.*
 
-![DynamoDB: chọn khóa theo câu hỏi và ghi có điều kiện](/images/3-Blog/blog3-dynamodb-key-design.png)
+Gần đây mình tìm hiểu các cách chạy inference cho mô hình học máy trên AWS, và phát hiện một điều khá thú vị: với nhiều bài toán, câu hỏi quan trọng nhất không phải "mô hình gì" mà là "mô hình được gọi như thế nào". Bài này mình ghi lại những gì đọc được, kèm một sơ đồ ví dụ có đánh số từng luồng (ảnh đính kèm) để dễ theo dõi.
 
-*Hình 1. Sơ đồ ví dụ một ứng dụng dự báo thời tiết đọc và ghi bảng DynamoDB, mình vẽ bằng draw.io dựa trên tài liệu AWS.*
+**Tình huống:** một cửa hàng online muốn dự báo số đơn hàng ngày mai cho từng kho. Mỗi đêm chạy một lần sau khi chốt dữ liệu trong ngày, mô hình chạy vài giây, kết quả ghi vào database để dashboard đọc lại. Không ai cần mô hình trả lời theo từng cú click.
 
-**Tình huống:** một ứng dụng thời tiết mỗi đêm chạy job tính dự báo 7 ngày tới cho từng thành phố. Web và API cần hiển thị dự báo mới nhất. Nếu lưu theo kiểu SQL (mỗi dòng là một thành phố, một ngày, một chỉ số), trang chủ muốn hiện dự báo của một thành phố sẽ phải đọc hàng chục item hoặc quét bảng. Với DynamoDB, đó là cách thiết kế vừa chậm vừa tốn tiền.
+Phản xạ đầu tiên thường là "mô hình học máy thì lên SageMaker endpoint". Nhưng khi đọc kỹ cách tính tiền, mình thấy lựa chọn này không hợp với kiểu workload trên.
 
-## 1. Liệt kê câu hỏi trước
+### 1. Bốn cách chạy inference trên SageMaker
 
-Viết ra các câu hỏi ứng dụng sẽ hỏi:
+- **Real-time endpoint:** tính tiền theo giờ instance trong suốt thời gian endpoint còn chạy, kể cả khi không có request nào. Hợp khi cần độ trễ thấp, lưu lượng đều, hoặc cần GPU.
+- **Serverless Inference:** tự về 0 khi rảnh, đổi lại có cold start. Bộ nhớ chọn từ 1 GB đến 6 GB và không có GPU.
+- **Asynchronous Inference:** request được đưa vào hàng đợi, hợp với payload lớn hoặc thời gian xử lý dài.
+- **Batch Transform:** chạy theo lô trên cả tập dữ liệu, xong thì tắt.
 
-- "Dự báo mới nhất của Hà Nội là gì?" (trang chủ)
-- "Dự báo được tạo ngày 2026-08-01 cho Đà Nẵng là gì?" (xem lại lịch sử)
-- Có câu nào cần quét toàn bảng không? Ở đây là không.
+Với job vài giây mỗi ngày, real-time endpoint gần như là trả tiền cho máy ngồi chờ. Batch Transform hay Serverless Inference dùng được, nhưng nếu mô hình nhỏ và chạy được bằng CPU thì còn một lựa chọn gọn hơn: AWS Lambda.
 
-## 2. Chọn khóa
+### 2. Vì sao là Lambda container image, không phải gói zip
 
-- **Partition key:** `city`
-- **Sort key:** `forecast_date`, dạng chuỗi `YYYY-MM-DD`. Định dạng này sắp xếp theo chữ cũng chính là sắp xếp theo thời gian.
+- Gói zip của Lambda giới hạn 250 MB sau khi giải nén (tính cả layer). Bộ thư viện dữ liệu như pandas, pyarrow, scikit-learn cộng lại rất dễ chạm trần.
+- Container image cho phép tới 10 GB (chưa nén, tính cả các layer).
+- Timeout tối đa vẫn là 15 phút. Chuyển sang container không đổi giới hạn này.
 
-Câu hỏi đầu tiên trở thành một Query đọc ngược, lấy đúng 1 item:
+Điểm mình thích nhất: cùng một image chạy được ở máy local để test trước khi đẩy lên Amazon ECR, nên "chạy được ở máy mình" và "chạy được trên Lambda" là cùng một thứ.
 
-```python
+### 3. Đi theo 7 luồng trên sơ đồ
+
+1. Build image, ghim base image bằng digest, tag bằng commit SHA rồi đẩy lên Amazon ECR.
+2. EventBridge Scheduler chạy theo lịch cron mỗi đêm, gọi Lambda prepare theo kiểu bất đồng bộ.
+3. Lambda prepare gom và làm sạch dữ liệu, ghi vào S3 theo ngày (`data/dt=…/`).
+4. Prepare chạy xong, Lambda destination gọi tiếp Lambda inference. Có thể nối cả OnSuccess lẫn OnFailure: nếu một nguồn dữ liệu lỗi, inference vẫn chạy cho phần dữ liệu còn tốt.
+5. Lambda inference đọc dữ liệu và trọng số mô hình trong `models/`.
+6. Kết quả được ghi vào DynamoDB để dashboard hoặc API đọc lại.
+7. Log và metric đi về CloudWatch: một dòng log tổng kết mỗi lần chạy và một alarm trên metric Errors là đủ để sáng hôm sau biết đêm qua chạy ra sao.
+
+![Sơ đồ pipeline batch inference hằng đêm với Lambda container image](/images/3-Blog/blog3_figure1.jpg)
+
+*Ảnh: sơ đồ ví dụ một pipeline batch inference hằng đêm, mình vẽ bằng draw.io dựa trên tài liệu AWS.*
+
+Ô đỏ góc dưới sơ đồ là phương án real-time endpoint chạy 24/7, không hợp với kiểu workload này.
+
+### 4. Những điều mình phát hiện khi đọc tài liệu
+
+**Mô hình nhỏ không nhất thiết phải mang cả framework lên Lambda.** Với các mô hình tuyến tính hoặc mạng nhỏ, có thể train ở nơi khác, xuất trọng số ra file (ví dụ `.npz`) rồi lúc dự báo chỉ cần NumPy để nhân ma trận. Image nhẹ hơn nhiều và khởi động nhanh hơn.
+
+**Base image không phải của AWS thì phải tự cài runtime interface client.** Base image của AWS (`public.ecr.aws/lambda/python`) có sẵn thành phần này. Nếu dùng image khác như `python:3.12-slim` thì phải cài `awslambdaric`, thiếu nó thì Lambda không gọi được handler.
+
+```dockerfile
 # Minh họa rút gọn
-import boto3
-from boto3.dynamodb.conditions import Key
-
-table = boto3.resource("dynamodb").Table("Forecasts")
-
-def latest(city: str) -> dict | None:
-    resp = table.query(
-        KeyConditionExpression=Key("city").eq(city),
-        ScanIndexForward=False,  # forecast_date giảm dần
-        Limit=1,
-    )
-    items = resp.get("Items", [])
-    return items[0] if items else None
+FROM python:3.12-slim@sha256:<digest>
+WORKDIR /function
+COPY requirements.txt .
+RUN pip install --no-cache-dir awslambdaric -r requirements.txt
+COPY src/ ./src/
+ENTRYPOINT ["python", "-m", "awslambdaric"]
+CMD ["src.inference.handler"]
 ```
 
-Câu hỏi thứ hai là GetItem với đủ hai khóa. Không cần GSI, không cần Scan.
+Thêm một chi tiết mình phát hiện khi chạy thử: `awslambdaric` tìm module handler theo thư mục làm việc của container. Nếu thư mục làm việc không phải nơi chứa `src/`, Lambda báo `Runtime.ImportModuleError`. Vì vậy nên khai báo `WORKDIR` rõ ràng thay vì dựa vào mặc định của base image.
 
-## 3. Một item chứa gì
+**Gọi bất đồng bộ thì Lambda tự thử lại.** Mặc định Lambda thử lại 2 lần khi function trả lỗi. Có thể chỉnh số lần thử lại từ 0 đến 2, và thời gian giữ event trong hàng đợi từ 60 giây đến 6 giờ. Với job inference, đặt retry bằng 0 thường hợp lý hơn: lỗi thì dừng, alarm báo, người vận hành đọc log rồi chạy lại có kiểm soát.
 
-Thay vì mỗi dòng một con số, gom trọn một lần dự báo của một thành phố vào một item: 7 ngày tới, mỗi ngày gồm nhiệt độ, lượng mưa, độ ẩm, kèm phiên bản mô hình và thời điểm tạo. Mỗi lần đọc chỉ tốn một request, và ứng dụng không phải ghép nhiều dòng. Chỉ cần để ý giới hạn kích thước một item là 400 KB.
+**Với lời gọi trực tiếp tới function, Lambda destinations chỉ áp dụng cho kiểu bất đồng bộ** (ngoài ra event source mapping của Kinesis, DynamoDB Streams và Kafka có OnFailure destination riêng). Đích có thể là Lambda khác, SQS, SNS, EventBridge, hoặc S3 (riêng S3 chỉ dùng cho OnFailure). Cái bẫy dễ gặp: `aws lambda invoke` mặc định gọi đồng bộ (`RequestResponse`), nên chạy tay thì function đầu chạy xong nhưng destination không kích hoạt. Muốn chạy lại cả chuỗi phải gọi:
 
-Một chi tiết nhỏ: với boto3 resource, số phải truyền vào dạng `Decimal`, truyền `float` sẽ báo lỗi. Khi làm tròn số trước khi ghi, nhớ rằng số đọc ra có thể lệch rất nhỏ so với số tính trong bộ nhớ, nên khi so sánh hãy dùng dung sai, đừng so bằng tuyệt đối.
-
-## 4. Đi theo 7 luồng trên sơ đồ
-
-1. Người dùng mở web trên AWS Amplify Hosting và đăng nhập bằng Amazon Cognito để nhận ID token.
-2. Web gọi API Gateway (REST) với header `Authorization: <ID token>`. Cognito authorizer kiểm token trước khi cho request đi tiếp.
-3. Lambda api đọc bảng bằng Query `Limit=1` (dự báo mới nhất) hoặc GetItem (theo ngày).
-4. EventBridge Scheduler chạy job dự báo mỗi đêm.
-5. Lambda batch ghi kết quả bằng PutItem có điều kiện.
-6. Nếu job bị chạy lại (chạy tay, hoặc Lambda tự thử lại), lần ghi thứ hai bị từ chối với `ConditionalCheckFailedException`. Code bắt lỗi này và coi như "đã có", không coi là sự cố.
-7. Mô hình thử nghiệm chạy song song trên cùng dữ liệu nhưng ghi sang S3, không ghi vào bảng phục vụ. Người dùng chỉ thấy kết quả của mô hình chính, còn mô hình mới vẫn được chấm điểm trên dữ liệu thật.
-
-## 5. Ghi có điều kiện: không ghi đè bản ghi đã có
-
-DynamoDB không có lệnh "insert". PutItem mặc định ghi đè nếu đã có item cùng khóa. Muốn mỗi cặp (`city`, `forecast_date`) chỉ được ghi một lần thì thêm `ConditionExpression`:
-
-```python
-# Minh họa rút gọn
-from botocore.exceptions import ClientError
-
-def put_once(item: dict) -> bool:
-    try:
-        table.put_item(
-            Item=item,
-            ConditionExpression="attribute_not_exists(city) AND attribute_not_exists(forecast_date)",
-        )
-        return True
-    except ClientError as e:
-        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
-            return False  # đã có bản ghi cho ngày này
-        raise
+```bash
+aws lambda invoke --function-name <prepare> --invocation-type Event out.json
 ```
 
-Ba điều mình phát hiện khi đọc tài liệu:
+### 5. Chi phí
 
-- Điều kiện được kiểm ngay trên item đó và thực hiện nguyên tử cùng lần ghi, nên không cần "đọc trước rồi mới ghi". Cách đọc trước rồi ghi vẫn có thể bị một tiến trình khác chen vào giữa.
-- Lần ghi bị từ chối vẫn tiêu tốn write capacity, số lượng tùy kích thước item.
-- Có tham số `ReturnValuesOnConditionCheckFailure` để DynamoDB trả về item hiện có ngay khi điều kiện sai, đỡ phải gọi thêm một lần đọc để xem chuyện gì đã xảy ra.
+Lambda có free tier 1 triệu request và 400.000 GB-giây mỗi tháng, không hết hạn sau 12 tháng như nhiều dịch vụ khác (tính chung cho cả tài khoản). Ví dụ một function 1 GB, giả sử lần nào cũng chạy hết 120 giây, mỗi đêm một lần thì một tháng chỉ khoảng 3.600 GB-giây, chưa tới 1% free tier. ECR tính phí lưu trữ image theo dung lượng, nên đặt lifecycle policy để chỉ giữ vài image gần nhất.
 
-## Checklist khi thiết kế bảng DynamoDB
+### Khi nào chọn gì
 
-- Đã liệt kê hết câu hỏi ứng dụng sẽ hỏi chưa? Mỗi câu là Query hay GetItem?
-- Sort key có sắp xếp đúng thứ tự mình cần không (ví dụ ngày dạng `YYYY-MM-DD`)?
-- Có câu nào bắt buộc phải Scan không? Nếu có, xem lại khóa hoặc thêm GSI.
-- Item có thể vượt 400 KB không?
-- Ghi đè có phải là hành vi mình muốn không? Nếu không, dùng `ConditionExpression`.
-- So sánh số đọc ra từ DynamoDB đã dùng dung sai chưa?
+- Chạy theo lô thưa, mô hình nhỏ, chạy bằng CPU, dưới 15 phút: **Lambda container image**.
+- Lưu lượng thất thường, chấp nhận cold start, không cần GPU: **SageMaker Serverless Inference**.
+- Payload lớn hoặc xử lý lâu: **SageMaker Asynchronous Inference**.
+- Chấm điểm cả tập dữ liệu lớn theo lô: **SageMaker Batch Transform**.
+- Cần độ trễ mili-giây liên tục, mô hình lớn hoặc cần GPU: **SageMaker real-time endpoint**.
 
-## Kết luận
+### Kết luận
 
-Với DynamoDB, chọn khóa đúng quan trọng hơn mọi thứ khác. Bắt đầu từ câu hỏi thì mọi lần đọc đều là Query hoặc GetItem, không cần GSI hay Scan. Còn ghi có điều kiện là cách rẻ và an toàn nhất để có ngữ nghĩa "chỉ ghi một lần", rất hợp với các job batch có thể bị chạy lại.
+Chọn dịch vụ theo cách workload thật sự chạy, không theo cái nhãn "đây là bài toán ML". Với một job dự báo vài giây mỗi đêm, Lambda container image đủ chỗ cho thư viện, chạy được y hệt ở local và gần như không tốn tiền. Phần còn lại là nắm rõ kiểu gọi (đồng bộ hay bất đồng bộ), vì nhiều tính năng của Lambda như destinations hay retry chỉ áp dụng cho một kiểu.
 
-*Lưu ý: giá và giới hạn dịch vụ có thể thay đổi, nên kiểm lại tài liệu AWS mới nhất. Đoạn code là minh họa rút gọn.*
+*Lưu ý: giá và giới hạn dịch vụ có thể thay đổi, nên kiểm lại trang AWS Pricing và tài liệu mới nhất trước khi áp dụng. Đoạn Dockerfile là minh họa rút gọn.*
 
 ### Tài liệu tham khảo
 
-- [Condition expressions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html)
-- [DynamoDB read and write operations (capacity khi điều kiện sai)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/read-write-operations.html)
-- [PutItem API](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html)
-- [Query](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html)
-- [Best practices for designing partition keys](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html)
-- [Handle conditional write errors in high concurrency scenarios](https://aws.amazon.com/blogs/database/handle-conditional-write-errors-in-high-concurrency-scenarios-with-amazon-dynamodb)
+- [Lambda quotas](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)
+- [Create a Lambda function using a container image](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html)
+- [Lambda asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html)
+- [AWS Lambda pricing](https://aws.amazon.com/lambda/pricing/)
+- [SageMaker Serverless Inference](https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html)
+- [Inference options in Amazon SageMaker AI](https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model-options.html)
 
-`#AWS #AmazonDynamoDB #APIGateway #AmazonCognito #Serverless #NoSQL #AWSStudyGroup #FCAJ`
+#AWS #AWSLambda #AmazonECR #AmazonSageMaker #Serverless #MLOps #AWSStudyGroup #FCAJ

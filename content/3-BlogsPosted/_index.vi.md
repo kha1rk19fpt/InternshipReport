@@ -6,16 +6,34 @@ chapter: false
 pre: " <b> 3. </b> "
 ---
 
-Ba bài blog dưới đây do tôi tự viết từ những gì đã học về các dịch vụ AWS trong quá trình làm dự án CPAWS, và đăng lên nhóm cộng đồng [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj). Mỗi bài dùng một ví dụ riêng và một sơ đồ tự vẽ bằng draw.io.
+5 bài blog kỹ thuật của nhóm đã đăng lên [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj/), mỗi thành viên một bài.
 
-### [Blog 1 - Mô hình chỉ chạy vài giây mỗi ngày: có cần đến SageMaker endpoint không?](3.1-blog1/)
+### [Blog 1 - Prompt caching cho chatbot có tool use: Đặt cachePoint đúng chỗ để giảm tới ~90% chi phí phần prompt lặp lại trên Amazon Bedrock](3.1-blog1/)
 
-So sánh bốn cách chạy inference trên SageMaker với AWS Lambda container image cho một job dự báo chạy mỗi đêm: giới hạn gói zip và container, 7 luồng của pipeline (ECR, EventBridge Scheduler, Lambda destinations, S3, DynamoDB, CloudWatch), retry khi gọi bất đồng bộ và chi phí.
+Bài tổng hợp từ tài liệu AWS, các con số là ví dụ minh họa. Bài giải thích prompt caching trong Converse API (`cachePoint` ở tools, system, messages; giá ghi và đọc cache; TTL), ước tính mức tiết kiệm cho phần lặp lại trong vòng lặp tool use, và đề xuất cách sắp xếp prompt để cache thật sự trúng (tĩnh trước, động sau; danh sách tool ổn định; mốc cache di động ở cuối message mới nhất), kèm các bẫy cần biết và cách đo tỉ lệ trúng.
 
-### [Blog 2 - Amazon S3 Versioning: tái lập kết quả xử lý dữ liệu khi file bị ghi đè](3.2-blog2/)
+Phan Tấn Phước đăng ngày 17/11/2026: [bài gốc trên AWS Study Group VN](https://www.facebook.com/groups/awsstudygroupfcj/permalink/2340410270057265/)
 
-Tổ chức data lake theo tầng, cách S3 Versioning giữ phiên bản cũ, ghim dữ liệu đầu vào bằng VersionId và SHA-256 trước một lần đánh giá, quyền `s3:GetObjectVersion` và lifecycle cho phiên bản cũ.
+### [Blog 2 - Khách hàng đặt hàng thành công nhưng hệ thống kho không nhận được event: Transactional Outbox giải quyết thế nào trên AWS?](3.2-blog2/)
 
-### [Blog 3 - Thiết kế bảng DynamoDB: bắt đầu từ câu hỏi, không phải từ dữ liệu](3.3-blog3/)
+Bài giải thích Dual Write Problem trong kiến trúc microservices và cách Transactional Outbox Pattern giải quyết: ghi đơn hàng và outbox event trong cùng một DynamoDB transaction (`TransactWriteItems`), rồi dùng DynamoDB Streams, EventBridge Pipes, EventBridge và SQS để phát event bất đồng bộ. Bài cũng nói vì sao consumer vẫn cần idempotency và khi nào nên dùng kiến trúc này.
 
-Chọn partition key và sort key từ các câu hỏi của ứng dụng, đọc bản mới nhất bằng Query `Limit=1`, gom một lần dự báo vào một item, và ghi có điều kiện để job chạy lại không ghi đè dữ liệu.
+Huỳnh Ngọc Tuấn đăng ngày 16/11/2026: [bài gốc trên AWS Study Group VN](https://www.facebook.com/groups/awsstudygroupfcj/permalink/2338993156865643/)
+
+### [Blog 3 - Mô hình chỉ chạy vài giây mỗi ngày: Có cần đến SageMaker Endpoint không?](3.3-blog3/)
+
+Bài so sánh bốn cách chạy inference trên SageMaker và chỉ ra vì sao một job dự báo nhỏ chạy mỗi đêm hợp với Lambda container image hơn real-time endpoint. Bài đi qua pipeline 7 bước (ECR, EventBridge Scheduler, Lambda destinations, S3, DynamoDB, CloudWatch), các bẫy gặp khi chạy thử (`awslambdaric`, `WORKDIR`, gọi đồng bộ và bất đồng bộ), chi phí so với free tier của Lambda, và bảng gợi ý khi nào chọn gì.
+
+Trịnh Tiến Khải đăng ngày 15/11/2026: [bài gốc trên AWS Study Group VN](https://www.facebook.com/groups/awsstudygroupfcj/permalink/2338607513570874/)
+
+### [Blog 4 - Từ SageMaker đến thiết bị: Triển khai mô hình ML xuống edge bằng AWS IoT Greengrass V2](3.4-blog4/)
+
+Bài tìm hiểu từ AWS IoT Greengrass V2 Developer Guide. Bài giải thích vì sao chạy suy luận ngay trên thiết bị, các khái niệm nền (core device, component, deployment, nucleus), cách chia model/runtime/inference component, điều kiện với bucket S3 và thiết bị, cách tùy biến component mẫu, và các điểm cần lưu ý (Edge Manager đã ngừng, phiên bản nucleus, runtime ghim phiên bản).
+
+Nguyễn Tiến Long đăng ngày 21/11/2026: [bài gốc trên AWS Study Group VN](https://www.facebook.com/groups/awsstudygroupfcj/permalink/2344828116282147/)
+
+### [Blog 5 - Mỗi tối chạy một việc rồi xử lý tiếp: Có cần một server chạy 24/7 hay Step Functions không?](3.5-blog5/)
+
+Bài hướng dẫn thay một máy chủ chạy cron bằng EventBridge Scheduler, Lambda (dùng container image khi thư viện nặng) và Lambda Destinations để nối hai bước, kèm CloudWatch Alarm để giám sát. Bài nói về retry policy của Scheduler và Lambda, IAM role tối thiểu quyền để tránh lỗi confused deputy, và khi nào nên chuyển sang Step Functions.
+
+Châu Trần Mạnh Tiến đăng ngày 15/11/2026: [bài gốc trên AWS Study Group VN](https://www.facebook.com/groups/awsstudygroupfcj/permalink/2338839130214379/)
