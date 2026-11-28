@@ -11,7 +11,7 @@ pre: " <b> 4.3. </b> "
 ### Event Overview
 
 - **Event Name:** Fireside Chat with Dr. Werner (AWS CTO), with the AWS FCAJ HCM community  
-- **Date:** October 2, 2026  
+- **Date:** 02/10/2026  
 - **Role:** Attendee  
 - **Format:** In-person talkshow  
 - **Location:** 26th floor, Bitexco Financial Tower, District 1, Ho Chi Minh City  

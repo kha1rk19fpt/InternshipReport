@@ -11,7 +11,7 @@ pre: " <b> 4.3. </b> "
 ### Tổng Quan Sự Kiện
 
 - **Tên Sự Kiện:** Fireside Chat with Dr. Werner (CTO AWS), cùng cộng đồng AWS FCAJ HCM  
-- **Ngày:** 2 tháng 10, 2026  
+- **Ngày:** 02/10/2026  
 - **Vai Trò:** Người tham dự  
 - **Hình Thức:** Buổi talkshow trực tiếp  
 - **Địa Điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, Quận 1, TP.HCM  

@@ -11,7 +11,7 @@ pre: " <b> 4.4. </b> "
 ### Event Overview
 
 - **Event Name:** Smart Plushies for Children (AWS Volunteering event)  
-- **Date:** October 26, 2026  
+- **Date:** 26/10/2026  
 - **Role:** Volunteer  
 - **Format:** Volunteering activity  
 - **Location:** 36th floor, Ho Chi Minh City  

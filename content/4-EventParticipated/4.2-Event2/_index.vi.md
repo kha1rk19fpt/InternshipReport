@@ -11,7 +11,7 @@ pre: " <b> 4.2. </b> "
 ### Tổng Quan Sự Kiện
 
 - **Tên Sự Kiện:** AWS Cloud and AI Day Hanoi – Watch Party: Ho Chi Minh City  
-- **Ngày:** 29 tháng 9, 2026  
+- **Ngày:** 29/09/2026  
 - **Vai Trò:** Người tham dự  
 - **Hình Thức:** Watch party: theo dõi trực tiếp sự kiện tại Hà Nội từ điểm cầu TP.HCM  
 - **Địa Điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, Quận 1, TP.HCM  

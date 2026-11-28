@@ -7,7 +7,7 @@ pre: " <b> 1.11. </b> "
 ---
 
 ### OBJECTIVES IN WEEK 11:
-- Freeze CPAWS project features (22/11), record the demo video and complete the submission package (repo README, workshop page).
+- After the CPAWS feature freeze (Sunday 22/11), record the demo video and complete the submission package (repo README, workshop page).
 - Master the development of complex Serverless applications (front-end, backend, image processing) with AWS SAM.
 - Practice a professional Machine Learning workflow on Amazon SageMaker: from feature engineering to model deployment.
 - Boost coding productivity with the AWS AI tools (Amazon Q, CodeWhisperer) in VS Code.

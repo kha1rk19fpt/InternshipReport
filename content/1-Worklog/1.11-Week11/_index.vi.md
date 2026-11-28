@@ -7,7 +7,7 @@ pre: " <b> 1.11. </b> "
 ---
 
 ### MỤC TIÊU TRONG WEEK 11:
-- Đóng băng tính năng dự án CPAWS (22/11), quay video demo và hoàn thiện hồ sơ nộp (README repo, trang workshop).
+- Sau khi đóng băng tính năng dự án CPAWS (Chủ nhật 22/11), quay video demo và hoàn thiện hồ sơ nộp (README repo, trang workshop).
 - Làm chủ quy trình phát triển ứng dụng Serverless phức tạp (Frontend, Backend, Xử lý ảnh) sử dụng AWS SAM.
 - Thực hành quy trình Machine Learning chuyên nghiệp trên Amazon SageMaker: Từ Feature Engineering đến Deploy Model.
 - Tối ưu hóa hiệu suất lập trình với bộ công cụ AI của AWS (Amazon Q, CodeWhisperer) trên VS Code.

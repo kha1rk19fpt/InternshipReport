@@ -11,7 +11,7 @@ pre: " <b> 4.4. </b> "
 ### Tổng Quan Sự Kiện
 
 - **Tên Sự Kiện:** Smart Plushies for Children (AWS Volunteering event)  
-- **Ngày:** 26 tháng 10, 2026  
+- **Ngày:** 26/10/2026  
 - **Vai Trò:** Tình nguyện viên  
 - **Hình Thức:** Hoạt động thiện nguyện  
 - **Địa Điểm:** Tầng 36, TP.HCM  

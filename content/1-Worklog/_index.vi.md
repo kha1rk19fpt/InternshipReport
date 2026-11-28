@@ -12,9 +12,9 @@ pre: " <b> 1. </b> "
 
 **Week 2:** [Quản lý truy cập (IAM), VPC & Kết nối Site-to-Site VPN](1.2-week2/)
 
-**Week 3:** [Hybrid DNS, VPC Peering & Dịch vụ Compute (EC2)](1.3-week3/)
+**Week 3:** [Hybrid DNS, VPC Peering, Dịch vụ Compute (EC2) & Sự kiện AWS](1.3-week3/)
 
-**Week 4:** [EC2 Nâng cao, Lưu trữ (Storage), Bảo mật (Security) & Sự kiện AWS](1.4-week4/)
+**Week 4:** [EC2 Nâng cao, Lưu trữ (Storage) & Bảo mật (Security)](1.4-week4/)
 
 **Week 5:** [Cơ sở dữ liệu, S3 Hosting & Auto Scaling](1.5-week5/)
 
@@ -26,7 +26,7 @@ pre: " <b> 1. </b> "
 
 **Week 9:** [AWS CDK, Kiến trúc 3 tầng & Đánh giá mô hình dự báo](1.9-week9/)
 
-**Week 10:** [Đặc trưng tín hiệu & Serverless DevOps (CI/CD)](1.10-week10/)
+**Week 10:** [Đánh giá mô hình & Serverless DevOps (CI/CD)](1.10-week10/)
 
 **Week 11:** [Serverless với SAM, Amazon SageMaker & AI Coding](1.11-week11/)
 

@@ -12,9 +12,9 @@ pre: " <b> 1. </b> "
 
 **Week 2:** [Access Management (IAM), VPC & Site-to-Site VPN](1.2-week2/)
 
-**Week 3:** [Hybrid DNS, VPC Peering & Compute Services (EC2)](1.3-week3/)
+**Week 3:** [Hybrid DNS, VPC Peering, Compute Services (EC2) & AWS Events](1.3-week3/)
 
-**Week 4:** [Advanced EC2, Storage, Security & AWS Events](1.4-week4/)
+**Week 4:** [Advanced EC2, Storage & Security](1.4-week4/)
 
 **Week 5:** [Databases, S3 Hosting & Auto Scaling](1.5-week5/)
 
@@ -26,7 +26,7 @@ pre: " <b> 1. </b> "
 
 **Week 9:** [AWS CDK, Three-Tier Architecture & Forecast Model Evaluation](1.9-week9/)
 
-**Week 10:** [Signal Features & Serverless DevOps (CI/CD)](1.10-week10/)
+**Week 10:** [Model Evaluation & Serverless DevOps (CI/CD)](1.10-week10/)
 
 **Week 11:** [Serverless with SAM, Amazon SageMaker & AI Coding](1.11-week11/)
 
