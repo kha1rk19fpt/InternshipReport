@@ -6,11 +6,11 @@ chapter: false
 pre: " <b> 1.12. </b> "
 ---
 
-### MỤC TIÊU TRONG WEEK 12:
+### Mục tiêu tuần 12:
 
-### CÁC ĐẦU VIỆC CỦA WEEK 12:
+### Các công việc cần triển khai trong tuần này:
 
-| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 |:---:|---|:---:|:---:|---|
 | **2** | | 30/11/2026 | 30/11/2026 |  |
 | **3** | | 01/12/2026 | 01/12/2026 |  |
@@ -18,4 +18,4 @@ pre: " <b> 1.12. </b> "
 | **5** | | 03/12/2026 | 03/12/2026 |  |
 | **6** | | 04/12/2026 | 04/12/2026 |  |
 
-### THÀNH TỰU ĐẠT ĐƯỢC TRONG WEEK 12:
+### Kết quả đạt được tuần 12:

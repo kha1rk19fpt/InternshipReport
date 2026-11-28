@@ -6,15 +6,15 @@ chapter: false
 pre: " <b> 1.10. </b> "
 ---
 
-### MỤC TIÊU TRONG WEEK 10:
+### Mục tiêu tuần 10:
 - Làm chủ kiến trúc Serverless toàn diện: Từ xử lý sự kiện (S3 triggers), lưu trữ (DynamoDB) đến xây dựng API (API Gateway).
 - Xây dựng quy trình CI/CD tự động cho ứng dụng Serverless bằng AWS CodePipeline.
 - Thực hành giám sát (Monitoring) và truy vết (Tracing) ứng dụng Serverless chuyên sâu với CloudWatch và X-Ray.
 - Đánh giá kết quả mô hình S1a, tạo tài khoản cho người chấm và mở tính năng mở đăng ký Cognito
 
-### CÁC ĐẦU VIỆC CỦA WEEK 10:
+### Các công việc cần triển khai trong tuần này:
 
-| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 |:---:|---|:---:|:---:|---|
 | **2** | **- Họp team project: Chốt kết quả đánh giá và mở tài khoản cho người chấm:**<br>- Duyệt kết quả test2020, giữ mô hình `baseline-q252`<br>- Review các PR báo cáo và tính năng tự đăng ký trên web<br>- Thống nhất mở tự đăng ký Cognito trong thời gian chấm | 16/11/2026 | 16/11/2026 | |
 | **3** | **- Thực hành Lab 22: Serverless - Tương tác giữa Lambda với S3 và DynamoDB**<br>+ Giới thiệu<br>+ Xử lý và Tối ưu Kích thước Ảnh trên AWS<br>* Tạo Lambda Function Xử Lý Ảnh<br>* Tạo S3 Bucket<br>* Tạo IAM Policy cho Lambda Function<br>* Kiểm tra hoạt động của Lambda Function<br>+ Ghi dữ liệu vào Amazon DynamoDB<br>* Tạo và Quản lý Bảng trong AWS DynamoDB<br>* Tạo Lambda Function để Ghi dữ liệu<br>+ Dọn dẹp tài nguyên | 17/11/2026 | 17/11/2026 | [Lab 22 Intro](https://000078.awsfcaj.com/vi/1-introduce/)<br>[Resize Function](https://000078.awsfcaj.com/vi/2-resize-image-function/)<br>[DynamoDB Write](https://000078.awsfcaj.com/vi/3-write-data-to-dynaomodb/) |
@@ -22,7 +22,7 @@ pre: " <b> 1.10. </b> "
 | **5** | **- Thực hành Lab 24: Serverless - CI/CD với CodePipeline**<br>+ Chuẩn bị<br>+ Xây dựng pipeline SAM<br>* Tạo kho Git<br>* Tạo SAM pipeline<br>+ Xây dựng pipeline cho front-end<br>* Tạo kho Git<br>* Tạo pipeline<br>+ Kiểm tra hoạt động web<br>+ Dọn dẹp | 19/11/2026 | 19/11/2026 | [Lab 24 Intro](https://000084.awsfcaj.com/vi/1-preparation/)<br>[SAM Pipeline](https://000084.awsfcaj.com/vi/2-build-sam-pipeline/) |
 | **6** | **- Thực hành Lab 25: Serverless - Giám sát ứng dụng Serverless với CloudWatch và X-Ray**<br>+ Chuẩn bị<br>+ Giám sát với CloudWatch<br>* Gỡ lỗi với nhật ký CloudWatch<br>* Tạo số liệu tùy chỉnh<br>* Tạo cảnh báo với CloudWatch Alarm<br>+ Theo dõi với X-ray<br>+ Dọn dẹp | 20/11/2026 | 20/11/2026 | [Lab 25 Intro](https://000085.awsfcaj.com/vi/1-preparation/)<br>[CloudWatch](https://000085.awsfcaj.com/vi/2-cloudwatch-monitor/)<br>[X-Ray](https://000085.awsfcaj.com/vi/3-x-ray-trace/) |
 
-### THÀNH TỰU ĐẠT ĐƯỢC TRONG WEEK 10:
+### Kết quả đạt được tuần 10:
 1. Xây dựng hoàn chỉnh luồng xử lý Serverless Backend: Tự động hóa xử lý ảnh với S3 Trigger và quản lý dữ liệu NoSQL với DynamoDB.
 2. Triển khai thành công Full-stack Serverless App: Kết nối Frontend với Backend thông qua API Gateway và Lambda, xử lý tốt vấn đề CORS.
 3. Thiết lập quy trình DevOps tự động (CI/CD) cho ứng dụng Serverless, giúp việc deploy Code và Frontend trở nên nhanh chóng và ít lỗi.

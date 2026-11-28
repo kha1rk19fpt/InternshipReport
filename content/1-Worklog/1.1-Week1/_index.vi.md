@@ -6,13 +6,13 @@ chapter: false
 pre: " <b> 1.1. </b> "
 ---
 
-### MỤC TIÊU TRONG WEEK 1:
+### Mục tiêu tuần 1:
 - Bước đầu khám phá, tìm hiểu về tài khoản AWS
 - Học một số thuật ngữ, khái niệm cơ bản trong các kiến trúc AWS
 
-### CÁC ĐẦU VIỆC CỦA WEEK 1:
+### Các công việc cần triển khai trong tuần này:
 
-| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 |:---:|---|:---:|:---:|---|
 | **2** | - Đọc và tìm hiểu kĩ quy định - nội quy chương trình<br>- Take note các hướng dẫn, lưu ý trong quá trình thực<br>- Review trước nội dung chương trình trong 3 tháng tới | 14/09/2026 | 14/09/2026 | [https://github.com/AWS-First-Cloud-Journey/README](https://github.com/AWS-First-Cloud-Journey/README)<br>[https://cloudjourney.awsfcaj.com/vi/](https://cloudjourney.awsfcaj.com/vi/)<br>[https://app.notion.com/p/Group-description-FPTU-3dcdf829a730804d973ae9f241bb7636](https://app.notion.com/p/Group-description-FPTU-3dcdf829a730804d973ae9f241bb7636) |
 | **3** | - Học cách tạo Workshop AWS:<br>+ Cài đặt và làm quen với Hugo, Markdown<br>+ Thực hành tạo workshop trên VS Code với template workshop mẫu<br>- Làm quen với draw.io, thực hành vẽ kiến trúc AWS trên draw.io | 15/09/2026 | 15/09/2026 | [YouTube: Workshop Tutorial](https://www.youtube.com/watch?v=mXRqgMr_97U&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=3)<br>[YouTube: Draw.io](https://youtu.be/l8isyDe-GwY?si=pTGxnXF2JjRsQQ9d) |
@@ -20,7 +20,7 @@ pre: " <b> 1.1. </b> "
 | **5** | - Thực hành Lab 1: Thiết lập Tài Khoản AWS<br>+ Tạo tài khoản AWS đầu tiên<br>+ Thiết lập MFA cho tài khoản Root<br>+ Tạo Admin Group và Admin User<br>+ Hỗ trợ xác thực tài khoản<br>+ Khám phá AWS Management Console<br>+ Tạo và Quản Lý Các Trường Hợp Hỗ Trợ trong AWS<br>- Thực hành Lab 2: Quản lý chi phí với AWS Budget<br>+ Tạo Budget<br>+ Tạo Cost Budget<br>+ Tạo Usage Budget<br>+ Tạo RI Budget<br>+ Tạo Savings Plans Budget<br>+ Dọn Dẹp Tài Nguyên<br>- Thực hành Lab 3: Yêu cầu Hỗ trợ từ AWS Support<br>+ Các gói hỗ trợ của AWS<br>+ Cách truy cập AWS Support<br>+ Quản lý Yêu cầu Hỗ trợ | 17/09/2026 | 17/09/2026 | [Lab 1 Video 1](https://www.youtube.com/watch?v=waR5S_lljrk&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=11&pp=iAQB)<br>[Lab 1 Video 2](https://www.youtube.com/watch?v=1dG5xutGbr4&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=12&pp=iAQB)<br>[Lab 1 Video 3](https://www.youtube.com/watch?v=b9pK1oG534Q&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=13&pp=iAQB)<br>[Lab 1 Video 4](https://www.youtube.com/watch?v=69iKhwI7k2Y&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=14&pp=iAQB)<br>[Lab 1 Video 5](https://www.youtube.com/watch?v=_a09nLVw6Sg&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=15&pp=iAQB)<br>[Lab 1 Video 6](https://www.youtube.com/watch?v=sd_KCcZOou0&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=16&pp=iAQB)<br>[Lab 1 Video 7](https://www.youtube.com/watch?v=kkcdRBRnxl4&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=17&pp=iAQB)<br>[Lab 2 Video 1](https://www.youtube.com/watch?v=aPQynt3CfYc&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=18&pp=iAQB)<br>[Lab 2 Video 2](https://www.youtube.com/watch?v=NoF8eEIEA6M&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=19&pp=iAQB)<br>[Lab 2 Video 3](https://www.youtube.com/watch?v=KeZi7eOLpOA&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=20&pp=iAQB)<br>[Lab 2 Video 4](https://www.youtube.com/watch?v=BAEh-_RzmNg&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=22&pp=iAQB)<br>[Lab 3 Video 1](https://www.youtube.com/watch?v=haafDPugAnE&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=23&pp=iAQB)<br>[Lab 3 Video 2](https://www.youtube.com/watch?v=ThJBaQ3DEBs&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=24&pp=iAQB) |
 | **6** | - Học Module 02: AWS VPC và Bảo Mật<br>+ 02-01: AWS Virtual Private Cloud (VPC)<br>+ 02-02: Bảo mật VPC<br>+ 02-03: VPN, DirectConnect, Load Balancer | 18/09/2026 | 18/09/2026 | [02-01](https://www.youtube.com/watch?v=O9Ac_vGHquM&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=25)<br>[02-02](https://www.youtube.com/watch?v=BPuD1l2hEQ4&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=26)<br>[02-03](https://www.youtube.com/watch?v=CXU8D3kyxIc&list=PLahN4TLWtox2a3vElknwzU_urND8hLn1i&index=27) |
 
-### THÀNH TỰU ĐẠT ĐƯỢC TRONG WEEK 1:
+### Kết quả đạt được tuần 1:
 1. Nắm vững nội quy, quy định và định hướng chương trình trong 3 tháng tới.
 2. Làm chủ công cụ tạo workshop AWS (Hugo, Markdown, VS Code) và biết cách vẽ kiến trúc AWS với draw.io.
 3. Hoàn thành Module 01: Kiến thức cơ bản về AWS, nắm được khái niệm Cloud Computing, hạ tầng toàn cầu của AWS, công cụ quản lý, tối ưu chi phí.

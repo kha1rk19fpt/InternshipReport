@@ -6,15 +6,15 @@ chapter: false
 pre: " <b> 1.6. </b> "
 ---
 
-### MỤC TIÊU TRONG WEEK 6:
+### Mục tiêu tuần 6:
 - Hiểu và ứng dụng kiến trúc Serverless (AWS Lambda) để tự động hóa vận hành (Cost Optimization) và xử lý sự kiện (Event-driven).
 - Nắm vững cách tương tác giữa Lambda với các dịch vụ lưu trữ (S3) và cơ sở dữ liệu NoSQL (DynamoDB).
 - Làm chủ công cụ dòng lệnh AWS CLI để quản lý tài nguyên nhanh chóng và chuyên nghiệp thay vì chỉ dùng Console.
 - Hoàn thiện thiết kế kiến trúc (Solution Architecture), bảng ước tính chi phí và chuẩn bị dữ liệu giá cho dự án CPAWS.
 
-### CÁC ĐẦU VIỆC CỦA WEEK 6:
+### Các công việc cần triển khai trong tuần này:
 
-| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
 |:---:|---|:---:|:---:|---|
 | **2** | **- Họp team project: Xác định, nghiên cứu solution architecture cho web app**<br>+ Chọn kiến trúc serverless chạy theo lịch: EventBridge Scheduler -> Lambda ingest -> S3 data lake -> Lambda predict -> DynamoDB -> API Gateway -> web<br>+ Tải giá vàng, bạc, Brent, WTI và tỷ giá USD/VND từ 01/2012 lên S3, làm EDA (phân phối return h = 1, 3, 7; ngày thiếu; giá WTI âm 20/4/2020) | 19/10/2026 | 19/10/2026 |  |
 | **3** | **- Thực hành Lab 13: Tối ưu chi phí EC2 với Lambda**<br>+ Giới thiệu<br>+ Các bước chuẩn bị<br>* Tạo VPC<br>* Tạo Security Group<br>* Tạo EC2 instance<br>* Incoming Web-hooks slack<br>+ Tạo Tag cho Instance<br>+ Tạo Role cho Lambda<br>+ Tạo Lambda Function<br>* Function stop instance<br>* Function start instance<br>+ Kiểm tra kết quả<br>+ Dọn dẹp tài nguyên | 20/10/2026 | 20/10/2026 | [Lab 13 Intro](https://000022.awsfcaj.com/vi/1-introduce/)<br>[Create Role](http://000022.awsfcaj.com/vi/4-createroleforlambda/)<br>[Lambda Function](https://000022.awsfcaj.com/vi/5-createlambdafunction/) |
@@ -22,7 +22,7 @@ pre: " <b> 1.6. </b> "
 | **5** | **- Họp team project: Hoàn thiện solution architecture, budget estimation cho web app**<br>+ Ước tính chi phí bằng AWS Pricing Calculator (khoảng 15–35 USD/tháng, nằm trong 200 USD credit), không dùng endpoint chạy 24/7 hay NAT Gateway<br>+ Chạy thử CEEMDAN theo cửa sổ trượt, đo thời gian và cache IMF giai đoạn 2014–2019 | 22/10/2026 | 22/10/2026 | [AWS Pricing Calculator](https://calculator.aws/#/)<br>[PyEMD (CEEMDAN)](https://pyemd.readthedocs.io/) |
 | **6** | **- Thực hành Lab 15: Làm quen với AWS CLI**<br>+ Giới thiệu<br>+ Các bước chuẩn bị<br>+ Cài đặt AWS CLI<br>+ Kiểm tra tài nguyên qua CLI<br>+ AWS CLI với Amazon S3<br>+ AWS CLI với Amazon SNS<br>+ AWS CLI với IAM<br>+ AWS CLI với VPC<br>* AWS CLI với VPC<br>* AWS CLI với Internet Gateway<br>+ Tạo EC2 sử dụng AWS CLI<br>+ Khắc phục lỗi<br>+ Dọn dẹp tài nguyên | 23/10/2026 | 23/10/2026 | [Lab 15 Intro](https://000011.awsfcaj.com/vi/1-introduce/)<br>[Install CLI](https://000011.awsfcaj.com/vi/3-installcli/)<br>[CLI with EC2](https://000011.awsfcaj.com/vi/9-ec2/) |
 
-### THÀNH TỰU ĐẠT ĐƯỢC TRONG WEEK 6:
+### Kết quả đạt được tuần 6:
 1. Triển khai thành công giải pháp tiết kiệm chi phí tự động (Lab 13): Sử dụng Lambda để Stop/Start EC2 theo lịch trình và tích hợp thông báo qua Slack.
 2. Xây dựng ứng dụng Serverless xử lý ảnh (Lab 14): Kết hợp Lambda, S3 và DynamoDB để tự động resize ảnh và lưu metadata.
 3. Hoàn thiện bản thiết kế kiến trúc serverless và bảng ước tính chi phí cho dự án CPAWS.

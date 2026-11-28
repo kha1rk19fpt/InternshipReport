@@ -6,11 +6,11 @@ chapter: false
 pre: " <b> 1.12. </b> "
 ---
 
-### OBJECTIVES IN WEEK 12:
+### Week 12 Objectives:
 
-### TASKS OF WEEK 12:
+### Tasks to be carried out this week:
 
-| Day | Task | Start Date | End Date | References |
+| Day | Task | Start Date | Completion Date | Reference Material |
 |:---:|---|:---:|:---:|---|
 | **Mon** | | 30/11/2026 | 30/11/2026 |  |
 | **Tue** | | 01/12/2026 | 01/12/2026 |  |
@@ -18,4 +18,4 @@ pre: " <b> 1.12. </b> "
 | **Thu** | | 03/12/2026 | 03/12/2026 |  |
 | **Fri** | | 04/12/2026 | 04/12/2026 |  |
 
-### ACHIEVEMENTS IN WEEK 12:
+### Week 12 Achievements:
